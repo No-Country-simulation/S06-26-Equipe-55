@@ -1,7 +1,8 @@
 FROM eclipse-temurin:21-jdk-alpine AS build
+RUN apk add --no-cache curl
 WORKDIR /app
 COPY . .
-RUN ./mvnw clean package -DskipTests
+RUN chmod +x mvnw && ./mvnw clean package -DskipTests
 
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
