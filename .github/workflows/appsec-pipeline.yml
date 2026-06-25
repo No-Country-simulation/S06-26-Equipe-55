@@ -172,5 +172,6 @@ jobs:
         with:
           scan-type: fs
           scan-ref: .
+          scanners: misconfig,secret
           format: table
           severity: CRITICAL,HIGH
