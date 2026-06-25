@@ -22,7 +22,7 @@ jobs:
         run: chmod +x mvnw
 
       - name: Build
-        run: ./mvnw clean package -DskipTests
+        run: ./mvnw clean install -DskipTests
 
       - name: Unit Tests
         run: ./mvnw test
@@ -49,7 +49,7 @@ jobs:
         run: chmod +x mvnw
 
       - name: SAST - SpotBugs + Find Security Bugs
-        run: ./mvnw compile spotbugs:check -Dspotbugs.failOnError=false
+        run: ./mvnw clean install -DskipTests && ./mvnw spotbugs:check -Dspotbugs.failOnError=false
 
       - name: Upload SpotBugs Report
         if: always()
@@ -89,6 +89,7 @@ jobs:
 
       - name: OWASP Dependency-Check
         run: |
+          ./mvnw clean install -DskipTests
           ./mvnw org.owasp:dependency-check-maven:check \
             -DfailBuildOnCVSS=9 \
             -Dformats=HTML,JSON
@@ -117,7 +118,7 @@ jobs:
         run: chmod +x mvnw
 
       - name: Build
-        run: ./mvnw clean package -DskipTests
+        run: ./mvnw clean install -DskipTests
 
       - name: Build Docker Image
         run: docker build -t wongola:${{ github.sha }} .
@@ -148,7 +149,7 @@ jobs:
 
       - name: Build & Start App
         run: |
-          ./mvnw clean package -DskipTests
+          ./mvnw clean install -DskipTests
           java -jar modules/api/target/*.jar &
           sleep 15
 
@@ -175,7 +176,7 @@ jobs:
         run: chmod +x mvnw
 
       - name: Resolve dependencies (populate local cache)
-        run: ./mvnw dependency:resolve -DskipTests
+        run: ./mvnw clean install -DskipTests
 
       - name: Trivy - Filesystem Scan
         uses: aquasecurity/trivy-action@master
