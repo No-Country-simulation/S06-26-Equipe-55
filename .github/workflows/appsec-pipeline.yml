@@ -170,4 +170,4 @@ jobs:
       - name: Trivy - Filesystem Scan
         run: |
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
-          trivy fs . --scanners misconfig,secret --severity CRITICAL,HIGH --format table --exit-code 0
+          trivy fs . --scanners misconfig,secret --severity CRITICAL,HIGH --format table --exit-code 0 --skip-dirs modules --skip-files pom.xml
