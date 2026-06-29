@@ -9,6 +9,20 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: wongola
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v4
 
@@ -25,6 +39,9 @@ jobs:
         run: ./mvnw clean install -DskipTests
 
       - name: Unit Tests
+        env:
+          DB_USERNAME: postgres
+          DB_PASSWORD: postgres
         run: ./mvnw test
 
       - uses: actions/upload-artifact@v4
@@ -136,6 +153,20 @@ jobs:
   dast:
     runs-on: ubuntu-latest
     needs: build
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: wongola
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v4
 
@@ -149,10 +180,14 @@ jobs:
         run: chmod +x mvnw
 
       - name: Build & Start App
+        env:
+          DB_USERNAME: postgres
+          DB_PASSWORD: postgres
         run: |
           ./mvnw clean install -DskipTests
           java -jar modules/api/target/*.jar &
-          sleep 15
+          sleep 20
+          curl -f http://localhost:8080/actuator/health || exit 1
 
       - name: OWASP ZAP - DAST Scan
         uses: zaproxy/action-baseline@v0.14.0
