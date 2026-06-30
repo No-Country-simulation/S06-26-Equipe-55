@@ -59,12 +59,22 @@ Com a aplicação rodando, acesse:
 
 ```json
 {
+  "cnpj": "12.345.678/0001-90",
   "razaoSocial": "Wongola Ltda",
   "nomeFantasia": "Wongola",
   "porte": "Médio",
   "segmento": "Tecnologia",
+  "setorAtuacao": "Fintech",
   "localizacaoMatriz": "São Paulo - SP",
-  "qtdColaboradores": 150
+  "regioesAtuacao": ["SP", "RJ", "MG"],
+  "qtdColaboradores": 150,
+  "percentualDiversidade": 30,
+  "prazoMetaEsg": "2026-12",
+  "responsavelRh": {
+    "nome": "Ana Silva",
+    "email": "ana@wongola.com",
+    "cargo": "Head de Diversidade"
+  }
 }
 ```
 
@@ -73,13 +83,44 @@ Com a aplicação rodando, acesse:
 ```json
 {
   "id": 1,
+  "cnpj": "12.345.678/0001-90",
   "razaoSocial": "Wongola Ltda",
   "nomeFantasia": "Wongola",
   "porte": "Médio",
   "segmento": "Tecnologia",
+  "setorAtuacao": "Fintech",
   "localizacaoMatriz": "São Paulo - SP",
-  "qtdColaboradores": 150
+  "regioesAtuacao": ["SP", "RJ", "MG"],
+  "qtdColaboradores": 150,
+  "percentualDiversidade": 30,
+  "prazoMetaEsg": "2026-12",
+  "responsavelRh": {
+    "id": 1,
+    "nome": "Ana Silva",
+    "email": "ana@wongola.com",
+    "cargo": "Head de Diversidade"
+  }
 }
+```
+
+**Campos obrigatórios:**
+
+| Campo | Tipo | Validação |
+|-------|------|-----------|
+| cnpj | String | Não pode ser vazio |
+| razaoSocial | String | Não pode ser vazio |
+| nomeFantasia | String | Não pode ser vazio |
+| porte | String | Não pode ser vazio |
+| segmento | String | Não pode ser vazio |
+| setorAtuacao | String | Não pode ser vazio |
+| localizacaoMatriz | String | Não pode ser vazio |
+| regioesAtuacao | List<String> | Não pode ser vazia |
+| qtdColaboradores | Integer | Positivo |
+| percentualDiversidade | Integer | 0 a 100 |
+| prazoMetaEsg | String | Formato YYYY-MM |
+| responsavelRh.nome | String | Não pode ser vazio |
+| responsavelRh.email | String | Email válido |
+| responsavelRh.cargo | String | Não pode ser vazio |
 ```
 
 ### Estrutura modular
