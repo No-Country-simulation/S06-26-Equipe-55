@@ -8,9 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,11 +19,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@Transactional
 @TestPropertySource(properties = {
-        "spring.datasource.url=jdbc:h2:mem:company_test;DB_CLOSE_DELAY=-1",
+        "spring.datasource.url=jdbc:h2:mem:company_test;DB_CLOSE_ON_EXIT=FALSE",
         "spring.datasource.driver-class-name=org.h2.Driver",
-        "spring.jpa.hibernate.ddl-auto=create-drop"
+        "spring.jpa.hibernate.ddl-auto=create-drop",
+        "spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.H2Dialect"
 })
 class CompanyControllerTest {
 
@@ -36,7 +37,7 @@ class CompanyControllerTest {
     @Test
     void shouldReturn201WhenCompanyIsCreated() throws Exception {
         CompanyRequest request = new CompanyRequest(
-                "12.345.678/0001-90", "Wongola Ltda", "Wongola", "Médio",
+                "11.111.111/0001-11", "Wongola Ltda", "Wongola", "Médio",
                 "Tecnologia", "Fintech", "São Paulo - SP",
                 List.of("SP", "RJ", "MG"), 150, 30, "2026-12",
                 new ResponsavelRhRequest("Ana Silva", "ana@wongola.com", "Head de Diversidade")
@@ -47,7 +48,7 @@ class CompanyControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.cnpj").value("12.345.678/0001-90"))
+                .andExpect(jsonPath("$.cnpj").value("11.111.111/0001-11"))
                 .andExpect(jsonPath("$.razaoSocial").value("Wongola Ltda"))
                 .andExpect(jsonPath("$.setorAtuacao").value("Fintech"))
                 .andExpect(jsonPath("$.regioesAtuacao[0]").value("SP"))
@@ -73,7 +74,7 @@ class CompanyControllerTest {
     @Test
     void shouldReturn400WhenResponsavelRhEmailIsInvalid() throws Exception {
         CompanyRequest request = new CompanyRequest(
-                "12.345.678/0001-90", "Wongola Ltda", "Wongola", "Médio",
+                "22.222.222/0001-22", "Wongola Ltda", "Wongola", "Médio",
                 "Tecnologia", "Fintech", "São Paulo - SP",
                 List.of("SP"), 150, 30, "2026-12",
                 new ResponsavelRhRequest("Ana Silva", "email-invalido", "Head de Diversidade")
@@ -88,7 +89,7 @@ class CompanyControllerTest {
     @Test
     void shouldReturn400WhenRegioesAtuacaoIsEmpty() throws Exception {
         CompanyRequest request = new CompanyRequest(
-                "12.345.678/0001-90", "Wongola Ltda", "Wongola", "Médio",
+                "33.333.333/0001-33", "Wongola Ltda", "Wongola", "Médio",
                 "Tecnologia", "Fintech", "São Paulo - SP",
                 List.of(), 150, 30, "2026-12",
                 new ResponsavelRhRequest("Ana Silva", "ana@wongola.com", "Head de Diversidade")
