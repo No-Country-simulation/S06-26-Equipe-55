@@ -1,8 +1,9 @@
 package com.wongola.api.config;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -36,6 +37,31 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, Object> handleNotFound(EntityNotFoundException ex) {
         return buildResponse(HttpStatus.NOT_FOUND, List.of(ex.getMessage()));
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public Map<String, Object> handleDataIntegrity(DataIntegrityViolationException ex) {
+        String message = "Registro duplicado ou violação de integridade";
+
+        String rootMessage = ex.getMostSpecificCause().getMessage();
+        if (rootMessage != null) {
+            if (rootMessage.toLowerCase().contains("cnpj")) {
+                message = "CNPJ já cadastrado";
+            } else if (rootMessage.toLowerCase().contains("email")) {
+                message = "Email já cadastrado";
+            } else if (rootMessage.toLowerCase().contains("unique")) {
+                message = "Registro já existe no sistema";
+            }
+        }
+
+        return buildResponse(HttpStatus.CONFLICT, List.of(message));
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, Object> handleMalformedJson(HttpMessageNotReadableException ex) {
+        return buildResponse(HttpStatus.BAD_REQUEST, List.of("JSON inválido ou mal formatado"));
     }
 
     @ExceptionHandler(Exception.class)

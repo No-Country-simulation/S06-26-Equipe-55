@@ -54,5 +54,10 @@ public record CompanyRequest(
 
         @NotNull @Valid
         @Schema(description = "Responsável de RH")
-        ResponsavelRhRequest responsavelRh
+        ResponsavelRhRequest responsavelRh,
+
+        @NotBlank
+        @Size(min = 6)
+        @Schema(description = "Senha para login", example = "senha123")
+        String senha
 ) {}

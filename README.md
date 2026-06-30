@@ -74,7 +74,8 @@ Com a aplicação rodando, acesse:
     "nome": "Ana Silva",
     "email": "ana@wongola.com",
     "cargo": "Head de Diversidade"
-  }
+  },
+  "senha": "senha123"
 }
 ```
 
@@ -121,6 +122,58 @@ Com a aplicação rodando, acesse:
 | responsavelRh.nome | String | Não pode ser vazio |
 | responsavelRh.email | String | Email válido |
 | responsavelRh.cargo | String | Não pode ser vazio |
+| senha | String | Mínimo 6 caracteres |
+
+---
+
+## API - Autenticação
+
+Endpoint REST para login da empresa. Retorna um token JWT necessário para acessar endpoints protegidos.
+
+### Endpoint
+
+`POST /api/auth/login`
+
+**Request body:**
+
+```json
+{
+  "email": "ana@wongola.com",
+  "senha": "senha123"
+}
+```
+
+**Response (200 OK):**
+
+```json
+{
+  "token": "<jwt_token>",
+  "empresaId": 1,
+  "nomeFantasia": "Wongola"
+}
+```
+
+### Endpoints protegidos
+
+Após o login, envie o token no header de todas as requests protegidas:
+
+```
+Authorization: Bearer <token>
+```
+
+| Endpoint | Acesso |
+|----------|--------|
+| POST /api/companies | Público |
+| POST /api/auth/login | Público |
+| POST /api/jobs | Autenticado |
+| Swagger UI | Público |
+
+### Variáveis de ambiente (JWT)
+
+| Variável | Padrão | Descrição |
+|----------|--------|-----------|
+| JWT_SECRET | (chave interna) | Chave secreta para assinar tokens |
+| jwt.expiration | 86400000 | Tempo de expiração do token (ms) - 24h |
 
 ---
 

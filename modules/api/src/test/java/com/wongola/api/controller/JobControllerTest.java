@@ -2,6 +2,7 @@ package com.wongola.api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wongola.api.dto.JobRequest;
+import com.wongola.api.security.JwtService;
 import com.wongola.core.entity.Company;
 import com.wongola.core.entity.ResponsavelRh;
 import com.wongola.core.repository.CompanyRepository;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +41,12 @@ class JobControllerTest {
     @Autowired
     private CompanyRepository companyRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtService jwtService;
+
     private Long createCompany() {
         Company company = new Company();
         company.setCnpj("99.999.999/0001-99");
@@ -52,6 +60,7 @@ class JobControllerTest {
         company.setQtdColaboradores(150);
         company.setPercentualDiversidade(30);
         company.setPrazoMetaEsg("2026-12");
+        company.setSenha(passwordEncoder.encode("senha123"));
 
         ResponsavelRh rh = new ResponsavelRh();
         rh.setNome("Ana Silva");
@@ -65,6 +74,7 @@ class JobControllerTest {
     @Test
     void shouldReturn201WhenJobIsCreated() throws Exception {
         Long companyId = createCompany();
+        String token = jwtService.generateToken(companyId, "ana@wongola.com");
 
         JobRequest request = new JobRequest(
                 companyId, "Dev Backend",
@@ -74,6 +84,7 @@ class JobControllerTest {
         );
 
         mockMvc.perform(post("/api/jobs")
+                        .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
@@ -87,6 +98,9 @@ class JobControllerTest {
 
     @Test
     void shouldReturn400WhenEmpresaIdNotFound() throws Exception {
+        Long companyId = createCompany();
+        String token = jwtService.generateToken(companyId, "ana@wongola.com");
+
         JobRequest request = new JobRequest(
                 999L, "Dev Backend",
                 "Descrição da vaga",
@@ -95,6 +109,7 @@ class JobControllerTest {
         );
 
         mockMvc.perform(post("/api/jobs")
+                        .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
@@ -103,6 +118,7 @@ class JobControllerTest {
     @Test
     void shouldReturn400WhenDescricaoExceeds3000Chars() throws Exception {
         Long companyId = createCompany();
+        String token = jwtService.generateToken(companyId, "ana@wongola.com");
         String longDescription = "x".repeat(3001);
 
         JobRequest request = new JobRequest(
@@ -112,8 +128,24 @@ class JobControllerTest {
         );
 
         mockMvc.perform(post("/api/jobs")
+                        .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldReturn403WhenNoToken() throws Exception {
+        JobRequest request = new JobRequest(
+                1L, "Dev Backend",
+                "Descrição da vaga",
+                List.of("Java"), "Pleno", "SP",
+                List.of("PCD"), 40, true
+        );
+
+        mockMvc.perform(post("/api/jobs")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isForbidden());
     }
 }
