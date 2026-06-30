@@ -5,26 +5,26 @@ import com.wongola.api.dto.JobRequest;
 import com.wongola.core.entity.Company;
 import com.wongola.core.entity.ResponsavelRh;
 import com.wongola.core.repository.CompanyRepository;
-import com.wongola.core.repository.JobRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
-import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @TestPropertySource(properties = {
-        "spring.datasource.url=jdbc:h2:mem:testdb_jobs;DB_CLOSE_DELAY=-1",
+        "spring.datasource.url=jdbc:h2:mem:job_test;DB_CLOSE_DELAY=-1",
         "spring.datasource.driver-class-name=org.h2.Driver",
         "spring.jpa.hibernate.ddl-auto=create-drop"
 })
@@ -39,18 +39,12 @@ class JobControllerTest {
     @Autowired
     private CompanyRepository companyRepository;
 
-    @Autowired
-    private JobRepository jobRepository;
-
     private Long companyId;
 
     @BeforeEach
     void setUp() {
-        jobRepository.deleteAll();
-        companyRepository.deleteAll();
-
         Company company = new Company();
-        company.setCnpj(UUID.randomUUID().toString().substring(0, 18));
+        company.setCnpj("99.999.999/0001-99");
         company.setRazaoSocial("Wongola Ltda");
         company.setNomeFantasia("Wongola");
         company.setPorte("Médio");
