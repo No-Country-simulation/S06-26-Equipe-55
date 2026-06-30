@@ -5,15 +5,14 @@ import com.wongola.api.dto.JobRequest;
 import com.wongola.core.entity.Company;
 import com.wongola.core.entity.ResponsavelRh;
 import com.wongola.core.repository.CompanyRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -22,11 +21,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@Transactional
 @TestPropertySource(properties = {
-        "spring.datasource.url=jdbc:h2:mem:job_test;DB_CLOSE_DELAY=-1",
+        "spring.datasource.url=jdbc:h2:mem:job_test;DB_CLOSE_ON_EXIT=FALSE",
         "spring.datasource.driver-class-name=org.h2.Driver",
-        "spring.jpa.hibernate.ddl-auto=create-drop"
+        "spring.jpa.hibernate.ddl-auto=create-drop",
+        "spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.H2Dialect"
 })
 class JobControllerTest {
 
@@ -39,10 +39,7 @@ class JobControllerTest {
     @Autowired
     private CompanyRepository companyRepository;
 
-    private Long companyId;
-
-    @BeforeEach
-    void setUp() {
+    private Long createCompany() {
         Company company = new Company();
         company.setCnpj("99.999.999/0001-99");
         company.setRazaoSocial("Wongola Ltda");
@@ -62,11 +59,13 @@ class JobControllerTest {
         rh.setCargo("Head de Diversidade");
         company.setResponsavelRh(rh);
 
-        companyId = companyRepository.save(company).getId();
+        return companyRepository.saveAndFlush(company).getId();
     }
 
     @Test
     void shouldReturn201WhenJobIsCreated() throws Exception {
+        Long companyId = createCompany();
+
         JobRequest request = new JobRequest(
                 companyId, "Dev Backend",
                 "Buscamos desenvolvedor backend com experiência em microsserviços",
@@ -103,6 +102,7 @@ class JobControllerTest {
 
     @Test
     void shouldReturn400WhenDescricaoExceeds3000Chars() throws Exception {
+        Long companyId = createCompany();
         String longDescription = "x".repeat(3001);
 
         JobRequest request = new JobRequest(
