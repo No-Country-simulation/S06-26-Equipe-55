@@ -1,5 +1,6 @@
 package com.wongola.api.config;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -31,9 +32,16 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST, List.of(ex.getMessage()));
     }
 
+    @ExceptionHandler(EntityNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, Object> handleNotFound(EntityNotFoundException ex) {
+        return buildResponse(HttpStatus.NOT_FOUND, List.of(ex.getMessage()));
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Map<String, Object> handleGeneral(Exception ex) {
+        ex.printStackTrace();
         return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, List.of("Erro interno do servidor"));
     }
 
