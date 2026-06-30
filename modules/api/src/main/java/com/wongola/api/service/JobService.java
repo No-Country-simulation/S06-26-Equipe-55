@@ -7,6 +7,8 @@ import com.wongola.core.repository.CompanyRepository;
 import com.wongola.core.repository.JobRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class JobService {
 
@@ -34,5 +36,9 @@ public class JobService {
         job.setFiltroAntiVies(request.filtroAntiVies());
 
         return jobRepository.save(job);
+    }
+
+    public List<Job> findByCompany(Long companyId) {
+        return jobRepository.findByCompanyId(companyId);
     }
 }

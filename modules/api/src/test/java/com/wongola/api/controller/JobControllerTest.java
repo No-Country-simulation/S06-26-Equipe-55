@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -147,5 +148,30 @@ class JobControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void shouldReturnOnlyJobsFromAuthenticatedCompany() throws Exception {
+        Long companyId = createCompany();
+        String token = jwtService.generateToken(companyId, "ana@wongola.com");
+
+        JobRequest request = new JobRequest(
+                companyId, "Dev Backend",
+                "Descrição da vaga",
+                List.of("Java"), "Pleno", "SP",
+                List.of("PCD"), 40, true
+        );
+
+        mockMvc.perform(post("/api/jobs")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(get("/api/jobs")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].empresaId").value(companyId))
+                .andExpect(jsonPath("$[0].titulo").value("Dev Backend"));
     }
 }

@@ -10,11 +10,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/jobs")
-@Tag(name = "Vagas", description = "Publicação de vagas")
+@Tag(name = "Vagas", description = "Publicação e listagem de vagas")
 public class JobController {
 
     private final JobService jobService;
@@ -30,5 +33,16 @@ public class JobController {
     public ResponseEntity<JobResponse> create(@Valid @RequestBody JobRequest request) {
         Job job = jobService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(JobResponse.from(job));
+    }
+
+    @GetMapping
+    @Operation(summary = "Listar vagas da empresa", description = "Retorna as vagas publicadas pela empresa autenticada")
+    @ApiResponse(responseCode = "200", description = "Lista de vagas")
+    public ResponseEntity<List<JobResponse>> listByCompany(Authentication authentication) {
+        Long companyId = (Long) authentication.getDetails();
+        List<JobResponse> jobs = jobService.findByCompany(companyId).stream()
+                .map(JobResponse::from)
+                .toList();
+        return ResponseEntity.ok(jobs);
     }
 }
