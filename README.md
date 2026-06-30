@@ -147,7 +147,7 @@ Endpoint REST para login da empresa. Retorna um token JWT necessário para acess
 
 ```json
 {
-  "token": "eyJhbGciOiJIUzM4NCJ9...",
+  "token": "<jwt_token>",
   "empresaId": 1,
   "nomeFantasia": "Wongola"
 }
