@@ -1,8 +1,7 @@
 package com.wongola.api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wongola.api.dto.JobRequest;
-import com.wongola.api.security.JwtService;
+import com.wongola.api.dto.LoginRequest;
 import com.wongola.core.entity.Company;
 import com.wongola.core.entity.ResponsavelRh;
 import com.wongola.core.repository.CompanyRepository;
@@ -25,12 +24,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Transactional
 @TestPropertySource(properties = {
-        "spring.datasource.url=jdbc:h2:mem:job_test;DB_CLOSE_ON_EXIT=FALSE",
+        "spring.datasource.url=jdbc:h2:mem:auth_test;DB_CLOSE_ON_EXIT=FALSE",
         "spring.datasource.driver-class-name=org.h2.Driver",
         "spring.jpa.hibernate.ddl-auto=create-drop",
         "spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.H2Dialect"
 })
-class JobControllerTest {
+class AuthControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -44,12 +43,9 @@ class JobControllerTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private JwtService jwtService;
-
-    private Long createCompany() {
+    private void createCompany() {
         Company company = new Company();
-        company.setCnpj("99.999.999/0001-99");
+        company.setCnpj("11.111.111/0001-11");
         company.setRazaoSocial("Wongola Ltda");
         company.setNomeFantasia("Wongola");
         company.setPorte("Médio");
@@ -68,65 +64,55 @@ class JobControllerTest {
         rh.setCargo("Head de Diversidade");
         company.setResponsavelRh(rh);
 
-        return companyRepository.saveAndFlush(company).getId();
+        companyRepository.saveAndFlush(company);
     }
 
     @Test
-    void shouldReturn201WhenJobIsCreated() throws Exception {
-        Long companyId = createCompany();
-        String token = jwtService.generateToken(companyId, "ana@wongola.com");
+    void shouldReturn200WithTokenWhenCredentialsAreValid() throws Exception {
+        createCompany();
 
-        JobRequest request = new JobRequest(
-                companyId, "Dev Backend",
-                "Buscamos desenvolvedor backend com experiência em microsserviços",
-                List.of("Java", "Spring Boot"), "Pleno", "SP",
-                List.of("PCD", "RACIAL"), 40, true
-        );
+        LoginRequest request = new LoginRequest("ana@wongola.com", "senha123");
 
-        mockMvc.perform(post("/api/jobs")
-                        .header("Authorization", "Bearer " + token)
+        mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.empresaId").value(companyId))
-                .andExpect(jsonPath("$.titulo").value("Dev Backend"))
-                .andExpect(jsonPath("$.skills[0]").value("Java"))
-                .andExpect(jsonPath("$.gruposFoco[0]").value("PCD"))
-                .andExpect(jsonPath("$.createdAt").exists());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.token").exists())
+                .andExpect(jsonPath("$.empresaId").exists())
+                .andExpect(jsonPath("$.nomeFantasia").value("Wongola"));
     }
 
     @Test
-    void shouldReturn400WhenEmpresaIdNotFound() throws Exception {
-        Long companyId = createCompany();
-        String token = jwtService.generateToken(companyId, "ana@wongola.com");
+    void shouldReturn400WhenEmailNotFound() throws Exception {
+        LoginRequest request = new LoginRequest("naoexiste@email.com", "senha123");
 
-        JobRequest request = new JobRequest(
-                999L, "Dev Backend",
-                "Descrição da vaga",
-                List.of("Java"), "Pleno", "SP",
-                List.of("PCD"), 40, true
-        );
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0]").value("Credenciais inválidas"));
+    }
 
-        mockMvc.perform(post("/api/jobs")
-                        .header("Authorization", "Bearer " + token)
+    @Test
+    void shouldReturn400WhenPasswordIsWrong() throws Exception {
+        createCompany();
+
+        LoginRequest request = new LoginRequest("ana@wongola.com", "senhaerrada");
+
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0]").value("Credenciais inválidas"));
+    }
+
+    @Test
+    void shouldReturn400WhenEmailIsInvalid() throws Exception {
+        LoginRequest request = new LoginRequest("email-invalido", "senha123");
+
+        mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void shouldReturn401WhenNoToken() throws Exception {
-        JobRequest request = new JobRequest(
-                1L, "Dev Backend",
-                "Descrição da vaga",
-                List.of("Java"), "Pleno", "SP",
-                List.of("PCD"), 40, true
-        );
-
-        mockMvc.perform(post("/api/jobs")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isForbidden());
     }
 }

@@ -1,5 +1,6 @@
 package com.wongola.core.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.List;
 
@@ -50,6 +51,10 @@ public class Company {
     @JoinColumn(name = "responsavel_rh_id")
     private ResponsavelRh responsavelRh;
 
+    @JsonIgnore
+    @Column(name = "senha", nullable = false)
+    private String senha;
+
     public Company() {}
 
     public Long getId() { return id; }
@@ -90,4 +95,7 @@ public class Company {
 
     public ResponsavelRh getResponsavelRh() { return responsavelRh; }
     public void setResponsavelRh(ResponsavelRh responsavelRh) { this.responsavelRh = responsavelRh; }
+
+    public String getSenha() { return senha; }
+    public void setSenha(String senha) { this.senha = senha; }
 }

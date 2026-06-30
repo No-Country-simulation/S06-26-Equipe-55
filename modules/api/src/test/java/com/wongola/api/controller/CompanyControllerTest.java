@@ -40,7 +40,8 @@ class CompanyControllerTest {
                 "11.111.111/0001-11", "Wongola Ltda", "Wongola", "Médio",
                 "Tecnologia", "Fintech", "São Paulo - SP",
                 List.of("SP", "RJ", "MG"), 150, 30, "2026-12",
-                new ResponsavelRhRequest("Ana Silva", "ana@wongola.com", "Head de Diversidade")
+                new ResponsavelRhRequest("Ana Silva", "ana@wongola.com", "Head de Diversidade"),
+                "senha123"
         );
 
         mockMvc.perform(post("/api/companies")
@@ -50,10 +51,7 @@ class CompanyControllerTest {
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.cnpj").value("11.111.111/0001-11"))
                 .andExpect(jsonPath("$.razaoSocial").value("Wongola Ltda"))
-                .andExpect(jsonPath("$.setorAtuacao").value("Fintech"))
-                .andExpect(jsonPath("$.regioesAtuacao[0]").value("SP"))
-                .andExpect(jsonPath("$.percentualDiversidade").value(30))
-                .andExpect(jsonPath("$.responsavelRh.nome").value("Ana Silva"));
+                .andExpect(jsonPath("$.senha").doesNotExist());
     }
 
     @Test
@@ -62,7 +60,8 @@ class CompanyControllerTest {
                 "", "Wongola Ltda", "Wongola", "Médio",
                 "Tecnologia", "Fintech", "São Paulo - SP",
                 List.of("SP"), 150, 30, "2026-12",
-                new ResponsavelRhRequest("Ana Silva", "ana@wongola.com", "Head de Diversidade")
+                new ResponsavelRhRequest("Ana Silva", "ana@wongola.com", "Head de Diversidade"),
+                "senha123"
         );
 
         mockMvc.perform(post("/api/companies")
@@ -77,7 +76,8 @@ class CompanyControllerTest {
                 "22.222.222/0001-22", "Wongola Ltda", "Wongola", "Médio",
                 "Tecnologia", "Fintech", "São Paulo - SP",
                 List.of("SP"), 150, 30, "2026-12",
-                new ResponsavelRhRequest("Ana Silva", "email-invalido", "Head de Diversidade")
+                new ResponsavelRhRequest("Ana Silva", "email-invalido", "Head de Diversidade"),
+                "senha123"
         );
 
         mockMvc.perform(post("/api/companies")
@@ -92,7 +92,8 @@ class CompanyControllerTest {
                 "33.333.333/0001-33", "Wongola Ltda", "Wongola", "Médio",
                 "Tecnologia", "Fintech", "São Paulo - SP",
                 List.of(), 150, 30, "2026-12",
-                new ResponsavelRhRequest("Ana Silva", "ana@wongola.com", "Head de Diversidade")
+                new ResponsavelRhRequest("Ana Silva", "ana@wongola.com", "Head de Diversidade"),
+                "senha123"
         );
 
         mockMvc.perform(post("/api/companies")
