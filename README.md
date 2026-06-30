@@ -121,7 +121,66 @@ Com a aplicação rodando, acesse:
 | responsavelRh.nome | String | Não pode ser vazio |
 | responsavelRh.email | String | Email válido |
 | responsavelRh.cargo | String | Não pode ser vazio |
+
+---
+
+## API - Publicação de Vagas
+
+Endpoint REST para publicação de vagas vinculadas a uma empresa.
+
+### Endpoint
+
+`POST /api/jobs`
+
+**Request body:**
+
+```json
+{
+  "empresaId": 1,
+  "titulo": "Dev Backend",
+  "descricao": "Buscamos desenvolvedor backend com experiência em microsserviços e APIs REST.",
+  "skills": ["Java", "Spring Boot"],
+  "nivel": "Pleno",
+  "regiao": "SP",
+  "gruposFoco": ["PCD", "RACIAL", "GENERO"],
+  "diversidadeMinima": 40,
+  "filtroAntiVies": true
+}
 ```
+
+**Response (201 Created):**
+
+```json
+{
+  "id": 1,
+  "empresaId": 1,
+  "titulo": "Dev Backend",
+  "descricao": "Buscamos desenvolvedor backend com experiência em microsserviços e APIs REST.",
+  "skills": ["Java", "Spring Boot"],
+  "nivel": "Pleno",
+  "regiao": "SP",
+  "gruposFoco": ["PCD", "RACIAL", "GENERO"],
+  "diversidadeMinima": 40,
+  "filtroAntiVies": true,
+  "createdAt": "2026-06-29T23:15:57"
+}
+```
+
+**Campos obrigatórios:**
+
+| Campo | Tipo | Validação |
+|-------|------|-----------|
+| empresaId | Long | Deve existir no banco |
+| titulo | String | Não pode ser vazio |
+| descricao | String | Não pode ser vazio, máx 3000 caracteres |
+| skills | List<String> | Não pode ser vazia |
+| nivel | String | Não pode ser vazio |
+| regiao | String | Não pode ser vazio |
+| gruposFoco | List<String> | Opcional |
+| diversidadeMinima | Integer | 0 a 100, opcional |
+| filtroAntiVies | Boolean | Opcional |
+
+---
 
 ### Estrutura modular
 
