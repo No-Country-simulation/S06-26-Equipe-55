@@ -22,6 +22,10 @@ export default defineConfig({
       }
     })
   ],
+  test: {
+    globals: true,
+    css: false
+  },
   server: {
     proxy: {
       '/api': 'http://localhost:8080'

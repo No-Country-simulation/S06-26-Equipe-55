@@ -159,6 +159,26 @@ modules/
 ├── core/       → Entidades JPA e Repositórios
 ├── api/        → Controllers, Services, DTOs, Security
 └── web/        → Frontend React (PWA)
+    ├── domains/auth/       → Login
+    ├── domains/company/    → Cadastro de empresa
+    ├── domains/job/        → Vagas (listagem, detalhe, edição)
+    ├── domains/match/      → Matching de candidatos
+    ├── domains/dashboard/  → Dashboard com gráficos
+    └── shared/             → Componentes, contexto e serviços
+```
+
+## Testes
+
+**Backend:**
+
+```bash
+./mvnw clean install -pl modules/core && ./mvnw test -pl modules/api
+```
+
+**Frontend:**
+
+```bash
+cd modules/web && npm test
 ```
 
 ## Pipeline AppSec
