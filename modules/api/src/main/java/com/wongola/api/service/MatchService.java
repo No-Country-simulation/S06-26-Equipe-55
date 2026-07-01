@@ -33,8 +33,8 @@ public class MatchService {
         List<CandidateDTO> candidates = candidateProvider.findAll();
 
         List<CandidateMatch> ranked = candidates.stream()
-                .filter(c -> hasSkillMatch(c, job))
                 .map(c -> toMatch(c, job))
+                .filter(c -> c.score() > 0)
                 .sorted(Comparator.comparingInt(CandidateMatch::score).reversed())
                 .toList();
 
@@ -44,13 +44,24 @@ public class MatchService {
         return new MatchResponse(ranked, candidates.size(), diversityPercent);
     }
 
-    private boolean hasSkillMatch(CandidateDTO candidate, Job job) {
-        return candidate.skills().stream()
-                .anyMatch(s -> job.getSkills().stream().anyMatch(js -> js.equalsIgnoreCase(s)));
-    }
-
     private CandidateMatch toMatch(CandidateDTO candidate, Job job) {
-        int score = 100 - candidate.gapPorcentual();
+        int totalCriterios = job.getSkills().size() + 1; // skills + nível
+        int atendidos = 0;
+
+        // Skills em comum
+        for (String skill : job.getSkills()) {
+            if (candidate.skills().stream().anyMatch(s -> s.equalsIgnoreCase(skill))) {
+                atendidos++;
+            }
+        }
+
+        // Nível compatível
+        if (candidate.nivel().equalsIgnoreCase(job.getNivel())) {
+            atendidos++;
+        }
+
+        int score = (atendidos * 100) / totalCriterios;
+        int gap = 100 - score;
 
         boolean badge = false;
         if (job.getGruposFoco() != null && candidate.gruposDiversidade() != null) {
@@ -60,12 +71,18 @@ public class MatchService {
 
         return new CandidateMatch(
                 candidate.id(),
+                candidate.nome(),
                 candidate.perfil(),
-                Math.max(0, score),
+                score,
                 badge,
                 candidate.skills(),
                 candidate.nivel(),
-                candidate.gapPorcentual()
+                candidate.areaInteresse(),
+                candidate.email(),
+                candidate.telefone(),
+                candidate.cidade(),
+                candidate.pais(),
+                gap
         );
     }
 }

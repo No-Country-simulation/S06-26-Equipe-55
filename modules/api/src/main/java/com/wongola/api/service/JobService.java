@@ -41,4 +41,24 @@ public class JobService {
     public List<Job> findByCompany(Long companyId) {
         return jobRepository.findByCompanyId(companyId);
     }
+
+    public Job update(Long id, JobRequest request, Long companyId) {
+        Job job = jobRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Vaga não encontrada com id: " + id));
+
+        if (!job.getCompany().getId().equals(companyId)) {
+            throw new IllegalArgumentException("Vaga não pertence à empresa autenticada");
+        }
+
+        if (request.titulo() != null) job.setTitulo(request.titulo());
+        if (request.descricao() != null) job.setDescricao(request.descricao());
+        if (request.skills() != null) job.setSkills(request.skills());
+        if (request.nivel() != null) job.setNivel(request.nivel());
+        if (request.regiao() != null) job.setRegiao(request.regiao());
+        if (request.gruposFoco() != null) job.setGruposFoco(request.gruposFoco());
+        if (request.diversidadeMinima() != null) job.setDiversidadeMinima(request.diversidadeMinima());
+        if (request.filtroAntiVies() != null) job.setFiltroAntiVies(request.filtroAntiVies());
+
+        return jobRepository.save(job);
+    }
 }
