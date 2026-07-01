@@ -45,4 +45,14 @@ public class JobController {
                 .toList();
         return ResponseEntity.ok(jobs);
     }
+
+    @PatchMapping("/{id}")
+    @Operation(summary = "Editar vaga", description = "Atualiza os dados de uma vaga existente")
+    @ApiResponse(responseCode = "200", description = "Vaga atualizada com sucesso")
+    @ApiResponse(responseCode = "400", description = "Dados inválidos ou vaga não pertence à empresa")
+    public ResponseEntity<JobResponse> update(@PathVariable Long id, @RequestBody JobRequest request, Authentication authentication) {
+        Long companyId = (Long) authentication.getDetails();
+        Job job = jobService.update(id, request, companyId);
+        return ResponseEntity.ok(JobResponse.from(job));
+    }
 }

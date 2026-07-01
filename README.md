@@ -1,61 +1,65 @@
-# Wangola - Equipe 55
+# Wongola - Equipe 55
 
-Aplicação Java Spring Boot com arquitetura de monolito modular.
+Plataforma de Matching Inclusivo que conecta empresas com profissionais de grupos sub-representados.
 
-## Pipeline AppSec
+## Stack
 
-Pipeline de segurança automatizado rodando no GitHub Actions:
+- **Backend:** Java 17 + Spring Boot 3.5 + PostgreSQL
+- **Frontend:** React + Vite + Tailwind CSS (PWA)
+- **Autenticação:** JWT (Spring Security)
+- **Documentação:** Swagger/OpenAPI
 
-| Etapa | Ferramenta | Objetivo |
-|-------|-----------|----------|
-| SAST | SpotBugs + Find Security Bugs | Análise estática de vulnerabilidades no código-fonte |
-| Detecção de Segredos | Gitleaks | Impede que credenciais e segredos sejam commitados |
-| SCA | OWASP Dependency-Check | Identifica CVEs conhecidas em dependências de terceiros |
-| Segurança de Containers | Trivy | Escaneia imagens Docker em busca de vulnerabilidades |
-| DAST | OWASP ZAP | Testes dinâmicos contra a aplicação em execução |
-| Scan de Filesystem | Trivy FS | Verifica arquivos de IaC e configuração por falhas |
-
-O pipeline é acionado a cada push nas branches `main`/`develop` e em pull requests para `main`.
-
-## API - Cadastro de Empresa
-
-Endpoint REST para cadastro de empresas no sistema.
-
-### Pré-requisitos
+## Pré-requisitos
 
 - Java 17+
-- PostgreSQL rodando na porta 5432
-- Banco `wongola` criado:
+- Node.js 18+
+- PostgreSQL 16+
 
 ```sql
 CREATE DATABASE wongola;
 ```
 
-### Variáveis de ambiente
+## Como rodar
 
-| Variável | Padrão | Descrição |
-|----------|--------|-----------|
-| DB_USERNAME | postgres | Usuário do banco |
-| DB_PASSWORD | postgres | Senha do banco |
-
-### Como rodar
+**Backend:**
 
 ```bash
 ./mvnw clean install -pl modules/core && ./mvnw spring-boot:run -pl modules/api
 ```
 
-### Documentação Swagger
+**Frontend:**
 
-Com a aplicação rodando, acesse:
+```bash
+cd modules/web && npm install && npm run dev
+```
 
-- Swagger UI: http://localhost:8080/swagger-ui.html
-- API Docs (JSON): http://localhost:8080/api-docs
+- App: http://localhost:5173
+- Swagger: http://localhost:8080/swagger-ui.html
+- API Docs: http://localhost:8080/api-docs
 
-### Endpoint
+## Variáveis de ambiente
+
+| Variável | Padrão | Descrição |
+|----------|--------|-----------|
+| DB_USERNAME | postgres | Usuário do banco |
+| DB_PASSWORD | postgres | Senha do banco |
+| JWT_SECRET | (chave interna) | Chave para assinar tokens |
+| jwt.expiration | 86400000 | Expiração do token (24h) |
+
+## Endpoints
+
+| Método | Endpoint | Acesso | Descrição |
+|--------|----------|--------|-----------|
+| POST | /api/companies | Público | Cadastro de empresa |
+| POST | /api/auth/login | Público | Login (retorna JWT) |
+| GET | /api/jobs | Autenticado | Listar vagas da empresa |
+| POST | /api/jobs | Autenticado | Publicar vaga |
+| PATCH | /api/jobs/{id} | Autenticado | Editar vaga |
+| POST | /api/match | Autenticado | Matching de candidatos |
+
+## API - Cadastro de Empresa
 
 `POST /api/companies`
-
-**Request body:**
 
 ```json
 {
@@ -79,62 +83,9 @@ Com a aplicação rodando, acesse:
 }
 ```
 
-**Response (201 Created):**
-
-```json
-{
-  "id": 1,
-  "cnpj": "12.345.678/0001-90",
-  "razaoSocial": "Wongola Ltda",
-  "nomeFantasia": "Wongola",
-  "porte": "Médio",
-  "segmento": "Tecnologia",
-  "setorAtuacao": "Fintech",
-  "localizacaoMatriz": "São Paulo - SP",
-  "regioesAtuacao": ["SP", "RJ", "MG"],
-  "qtdColaboradores": 150,
-  "percentualDiversidade": 30,
-  "prazoMetaEsg": "2026-12",
-  "responsavelRh": {
-    "id": 1,
-    "nome": "Ana Silva",
-    "email": "ana@wongola.com",
-    "cargo": "Head de Diversidade"
-  }
-}
-```
-
-**Campos obrigatórios:**
-
-| Campo | Tipo | Validação |
-|-------|------|-----------|
-| cnpj | String | Não pode ser vazio |
-| razaoSocial | String | Não pode ser vazio |
-| nomeFantasia | String | Não pode ser vazio |
-| porte | String | Não pode ser vazio |
-| segmento | String | Não pode ser vazio |
-| setorAtuacao | String | Não pode ser vazio |
-| localizacaoMatriz | String | Não pode ser vazio |
-| regioesAtuacao | List<String> | Não pode ser vazia |
-| qtdColaboradores | Integer | Positivo |
-| percentualDiversidade | Integer | 0 a 100 |
-| prazoMetaEsg | String | Formato YYYY-MM |
-| responsavelRh.nome | String | Não pode ser vazio |
-| responsavelRh.email | String | Email válido |
-| responsavelRh.cargo | String | Não pode ser vazio |
-| senha | String | Mínimo 6 caracteres |
-
----
-
-## API - Autenticação
-
-Endpoint REST para login da empresa. Retorna um token JWT necessário para acessar endpoints protegidos.
-
-### Endpoint
+## API - Login
 
 `POST /api/auth/login`
-
-**Request body:**
 
 ```json
 {
@@ -143,7 +94,7 @@ Endpoint REST para login da empresa. Retorna um token JWT necessário para acess
 }
 ```
 
-**Response (200 OK):**
+Response:
 
 ```json
 {
@@ -153,92 +104,70 @@ Endpoint REST para login da empresa. Retorna um token JWT necessário para acess
 }
 ```
 
-### Endpoints protegidos
-
-Após o login, envie o token no header de todas as requests protegidas:
-
-```
-Authorization: Bearer <token>
-```
-
-| Endpoint | Acesso |
-|----------|--------|
-| POST /api/companies | Público |
-| POST /api/auth/login | Público |
-| POST /api/jobs | Autenticado |
-| Swagger UI | Público |
-
-### Variáveis de ambiente (JWT)
-
-| Variável | Padrão | Descrição |
-|----------|--------|-----------|
-| JWT_SECRET | (chave interna) | Chave secreta para assinar tokens |
-| jwt.expiration | 86400000 | Tempo de expiração do token (ms) - 24h |
-
----
-
 ## API - Publicação de Vagas
 
-Endpoint REST para publicação de vagas vinculadas a uma empresa.
-
-### Endpoint
-
-`POST /api/jobs`
-
-**Request body:**
+`POST /api/jobs` (requer token)
 
 ```json
 {
   "empresaId": 1,
   "titulo": "Dev Backend",
-  "descricao": "Buscamos desenvolvedor backend com experiência em microsserviços e APIs REST.",
+  "descricao": "Buscamos desenvolvedor backend com experiência em microsserviços.",
   "skills": ["Java", "Spring Boot"],
   "nivel": "Pleno",
   "regiao": "SP",
   "gruposFoco": ["PCD", "RACIAL", "GENERO"],
-  "diversidadeMinima": 40,
-  "filtroAntiVies": true
+  "diversidadeMinima": 40
 }
 ```
 
-**Response (201 Created):**
+## API - Matching
+
+`POST /api/match` (requer token)
+
+```json
+{ "jobId": 1 }
+```
+
+Response:
 
 ```json
 {
-  "id": 1,
-  "empresaId": 1,
-  "titulo": "Dev Backend",
-  "descricao": "Buscamos desenvolvedor backend com experiência em microsserviços e APIs REST.",
-  "skills": ["Java", "Spring Boot"],
-  "nivel": "Pleno",
-  "regiao": "SP",
-  "gruposFoco": ["PCD", "RACIAL", "GENERO"],
-  "diversidadeMinima": 40,
-  "filtroAntiVies": true,
-  "createdAt": "2026-06-29T23:15:57"
+  "candidatos": [
+    {
+      "id": 1,
+      "nome": "João Silva",
+      "perfil": "Backend Developer",
+      "score": 75,
+      "badgeDiversidade": true,
+      "skills": ["Java", "Spring Boot"],
+      "nivel": "Pleno",
+      "gapPorcentual": 25
+    }
+  ],
+  "totalAnalisados": 8,
+  "diversidadeResultado": 50
 }
 ```
 
-**Campos obrigatórios:**
+Score = % de critérios da vaga que o candidato atende (skills + nível).
 
-| Campo | Tipo | Validação |
-|-------|------|-----------|
-| empresaId | Long | Deve existir no banco |
-| titulo | String | Não pode ser vazio |
-| descricao | String | Não pode ser vazio, máx 3000 caracteres |
-| skills | List<String> | Não pode ser vazia |
-| nivel | String | Não pode ser vazio |
-| regiao | String | Não pode ser vazio |
-| gruposFoco | List<String> | Opcional |
-| diversidadeMinima | Integer | 0 a 100, opcional |
-| filtroAntiVies | Boolean | Opcional |
-
----
-
-### Estrutura modular
+## Estrutura
 
 ```
 modules/
 ├── core/       → Entidades JPA e Repositórios
-└── api/        → Controllers, Services, DTOs
+├── api/        → Controllers, Services, DTOs, Security
+└── web/        → Frontend React (PWA)
 ```
+
+## Pipeline AppSec
+
+| Etapa | Ferramenta |
+|-------|-----------|
+| SAST | SpotBugs + Find Security Bugs |
+| Segredos | Gitleaks |
+| SCA | OWASP Dependency-Check |
+| Containers | Trivy |
+| DAST | OWASP ZAP |
+| Filesystem | Trivy FS |

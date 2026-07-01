@@ -10,6 +10,9 @@ public record CandidateMatch(
         @Schema(description = "ID do candidato")
         Long id,
 
+        @Schema(description = "Nome do candidato")
+        String nome,
+
         @Schema(description = "Perfil do candidato")
         String perfil,
 
@@ -24,6 +27,21 @@ public record CandidateMatch(
 
         @Schema(description = "Nível do candidato")
         String nivel,
+
+        @Schema(description = "Área de interesse")
+        String areaInteresse,
+
+        @Schema(description = "Email do candidato")
+        String email,
+
+        @Schema(description = "Telefone do candidato")
+        String telefone,
+
+        @Schema(description = "Cidade do candidato")
+        String cidade,
+
+        @Schema(description = "País do candidato")
+        String pais,
 
         @Schema(description = "Gap porcentual")
         Integer gapPorcentual
