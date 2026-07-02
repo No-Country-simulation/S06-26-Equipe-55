@@ -8,6 +8,7 @@ import { JobsPage } from './domains/job/JobsPage';
 import { JobDetailPage } from './domains/job/JobDetailPage';
 import { MatchPage } from './domains/match/MatchPage';
 import { DashboardPage } from './domains/dashboard/DashboardPage';
+import { ProfilePage } from './domains/profile/ProfilePage';
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
           <Route path="/match" element={<ProtectedRoute><MatchPage /></ProtectedRoute>} />
           <Route path="/" element={<LoginPage />} />
           <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>

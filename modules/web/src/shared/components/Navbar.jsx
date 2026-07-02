@@ -28,6 +28,7 @@ export function Navbar() {
               <Link to="/dashboard" className="hover:underline cursor-pointer">Dashboard</Link>
               <Link to="/jobs" className="hover:underline cursor-pointer">Vagas</Link>
               <Link to="/match" className="hover:underline cursor-pointer">Matching</Link>
+              <Link to="/profile" className="hover:underline cursor-pointer">Configurações</Link>
               <button onClick={handleLogout} className="bg-white/20 px-3 py-1 rounded hover:bg-white/30 cursor-pointer">Sair</button>
             </>
           ) : (
@@ -55,6 +56,7 @@ export function Navbar() {
               <Link to="/dashboard" className="hover:underline cursor-pointer" onClick={closeMenu}>Dashboard</Link>
               <Link to="/jobs" className="hover:underline cursor-pointer" onClick={closeMenu}>Vagas</Link>
               <Link to="/match" className="hover:underline cursor-pointer" onClick={closeMenu}>Matching</Link>
+              <Link to="/profile" className="hover:underline cursor-pointer" onClick={closeMenu}>Configurações</Link>
               <button onClick={handleLogout} className="bg-white/20 px-3 py-2 rounded hover:bg-white/30 text-left cursor-pointer">Sair</button>
             </>
           ) : (

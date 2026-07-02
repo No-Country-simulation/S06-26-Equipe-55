@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { jsPDF } from 'jspdf';
 import { api } from '../../shared/services/api';
+import { useAuth } from '../../shared/context/AuthContext';
 
 const COLORS = ['#1e3a5f', '#60a5fa', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
 
 export function DashboardPage() {
+  const { user } = useAuth();
   const [jobs, setJobs] = useState([]);
   const [matchData, setMatchData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -50,8 +53,9 @@ export function DashboardPage() {
     ? [...new Map(matchData.flatMap(m => m.candidatos).map(c => [c.id, c])).values()]
     : [];
   const totalCompatíveis = uniqueCandidates.length;
+  const totalMatches = uniqueCandidates.filter(c => c.badgeDiversidade).length;
   const avgDiversidade = uniqueCandidates.length > 0
-    ? Math.round(uniqueCandidates.filter(c => c.badgeDiversidade).length * 100 / uniqueCandidates.length)
+    ? Math.round(totalMatches * 100 / uniqueCandidates.length)
     : 0;
 
   // Dados para gráfico de diversidade (pizza)
@@ -116,12 +120,169 @@ export function DashboardPage() {
   const allLocations = locationData();
   const visibleLocations = allLocations.slice(0, locationLimit);
 
+  const generatePDF = async () => {
+    const doc = new jsPDF();
+    const now = new Date().toLocaleDateString('pt-BR');
+    let y = 20;
+
+    // Buscar dados atualizados da empresa
+    let companyName = user.nomeFantasia;
+    let metaDiversidade = '';
+    let prazoMeta = '';
+    try {
+      const company = await api.get('/companies/me');
+      companyName = company.nomeFantasia;
+      metaDiversidade = company.percentualDiversidade ? `${company.percentualDiversidade}%` : 'Não definida';
+      prazoMeta = company.prazoMetaEsg || 'Não definido';
+    } catch (e) {}
+
+    // Header
+    doc.setFillColor(30, 58, 95);
+    doc.rect(0, 0, 210, 40, 'F');
+    doc.setFontSize(22);
+    doc.setTextColor(255);
+    doc.text('Relatório ESG', 20, 18);
+    doc.setFontSize(12);
+    doc.text('Diversidade & Inclusão', 20, 28);
+    doc.setFontSize(10);
+    doc.text(`${companyName} | ${now}`, 20, 36);
+
+    y = 55;
+
+    // Meta ESG
+    doc.setFontSize(13);
+    doc.setTextColor(30, 58, 95);
+    doc.text('Meta ESG', 20, y);
+    y += 10;
+    doc.setFontSize(10);
+    doc.setTextColor(60);
+    doc.text(`Meta de diversidade: ${metaDiversidade}`, 25, y); y += 7;
+    doc.text(`Prazo: ${prazoMeta}`, 25, y); y += 7;
+    doc.text(`Resultado atual: ${avgDiversidade}%`, 25, y); y += 7;
+
+    // Linha separadora
+    y += 5;
+    doc.setDrawColor(200);
+    doc.line(20, y, 190, y);
+    y += 10;
+
+    // Métricas
+    doc.setFontSize(13);
+    doc.setTextColor(30, 58, 95);
+    doc.text('Métricas Gerais', 20, y); y += 10;
+    doc.setFontSize(10);
+    doc.setTextColor(60);
+
+    const metricas = [
+      ['Vagas publicadas', totalVagas],
+      ['Candidatos na base', totalCandidatos],
+      ['Candidatos compatíveis', totalCompatíveis],
+      ['Matches ESG', totalMatches],
+      ['Diversidade média', `${avgDiversidade}%`]
+    ];
+    metricas.forEach(([label, val]) => {
+      if (y > 260) { doc.addPage(); y = 20; }
+      doc.text(`${label}:`, 25, y);
+      doc.setTextColor(30, 58, 95);
+      doc.text(`${val}`, 80, y);
+      doc.setTextColor(60);
+      y += 7;
+    });
+
+    y += 5;
+    doc.setDrawColor(200);
+    doc.line(20, y, 190, y);
+    y += 10;
+
+    // Diversidade
+    if (y > 260) { doc.addPage(); y = 20; }
+    doc.setFontSize(13);
+    doc.setTextColor(30, 58, 95);
+    doc.text('Diversidade nos Matches', 20, y); y += 10;
+    doc.setFontSize(10);
+    doc.setTextColor(60);
+    diversityData().forEach(d => {
+      if (y > 260) { doc.addPage(); y = 20; }
+      doc.text(`\u2022 ${d.name}: ${d.value}`, 25, y); y += 7;
+    });
+
+    y += 5;
+    doc.setDrawColor(200);
+    doc.line(20, y, 190, y);
+    y += 10;
+
+    // Nível
+    if (y > 260) { doc.addPage(); y = 20; }
+    doc.setFontSize(13);
+    doc.setTextColor(30, 58, 95);
+    doc.text('Distribuição por Nível', 20, y); y += 10;
+    doc.setFontSize(10);
+    doc.setTextColor(60);
+    levelData().forEach(d => {
+      if (y > 260) { doc.addPage(); y = 20; }
+      doc.text(`\u2022 ${d.name}: ${d.value} candidato(s)`, 25, y); y += 7;
+    });
+
+    y += 5;
+    doc.setDrawColor(200);
+    doc.line(20, y, 190, y);
+    y += 10;
+
+    // Skills
+    if (y > 260) { doc.addPage(); y = 20; }
+    doc.setFontSize(13);
+    doc.setTextColor(30, 58, 95);
+    doc.text('Skills Mais Demandadas', 20, y); y += 10;
+    doc.setFontSize(10);
+    doc.setTextColor(60);
+    skillsData().forEach(d => {
+      if (y > 260) { doc.addPage(); y = 20; }
+      doc.text(`\u2022 ${d.name}: ${d.value} vaga(s)`, 25, y); y += 7;
+    });
+
+    // Nova página se necessário
+    if (y > 250) { doc.addPage(); y = 20; }
+    y += 5;
+    doc.setDrawColor(200);
+    doc.line(20, y, 190, y);
+    y += 10;
+
+    // Localização
+    if (y > 260) { doc.addPage(); y = 20; }
+    doc.setFontSize(13);
+    doc.setTextColor(30, 58, 95);
+    doc.text('Localização dos Candidatos', 20, y); y += 10;
+    doc.setFontSize(10);
+    doc.setTextColor(60);
+    allLocations.slice(0, 15).forEach(d => {
+      if (y > 260) { doc.addPage(); y = 20; }
+      doc.text(`\u2022 ${d.name}: ${d.value} candidato(s)`, 25, y); y += 7;
+    });
+
+    // Footer
+    const pageCount = doc.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(150);
+      doc.text(`Wongola - Relatório ESG | Página ${i} de ${pageCount}`, 20, 290);
+    }
+
+    doc.save(`relatorio-esg-${companyName.toLowerCase().replace(/\s/g, '-')}-${now.replace(/\//g, '-')}.pdf`);
+  };
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-primary mb-6">Dashboard</h1>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <h1 className="text-2xl font-bold text-primary">Dashboard</h1>
+        <button onClick={generatePDF}
+          className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-light cursor-pointer text-sm">
+          📄 Exportar Relatório ESG (PDF)
+        </button>
+      </div>
 
       {/* Métricas */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 mb-8">
         <div className="bg-white rounded-lg shadow p-4 text-center group relative">
           <p className="text-2xl font-bold text-primary">{totalVagas}</p>
           <p className="text-sm text-gray-500">Vagas publicadas</p>
@@ -134,8 +295,13 @@ export function DashboardPage() {
         </div>
         <div className="bg-white rounded-lg shadow p-4 text-center group relative">
           <p className="text-2xl font-bold text-primary">{totalCompatíveis}</p>
-          <p className="text-sm text-gray-500">Matches encontrados</p>
+          <p className="text-sm text-gray-500">Candidatos compatíveis</p>
           <span className="invisible group-hover:visible absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-gray-800 text-white text-xs rounded px-3 py-1 whitespace-nowrap">Candidatos com pelo menos 1 skill compatível</span>
+        </div>
+        <div className="bg-white rounded-lg shadow p-4 text-center group relative">
+          <p className="text-2xl font-bold text-primary">{totalMatches}</p>
+          <p className="text-sm text-gray-500">Matches ESG</p>
+          <span className="invisible group-hover:visible absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-gray-800 text-white text-xs rounded px-3 py-1 whitespace-nowrap">Candidatos compatíveis que atendem à meta de diversidade</span>
         </div>
         <div className="bg-white rounded-lg shadow p-4 text-center group relative">
           <p className="text-2xl font-bold text-primary">{avgDiversidade}%</p>

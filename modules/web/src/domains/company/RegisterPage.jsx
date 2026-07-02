@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { api } from '../../shared/services/api';
+import { RegionSelect } from '../../shared/components/RegionSelect';
+import { StateSelect } from '../../shared/components/StateSelect';
 
 export function RegisterPage() {
   const navigate = useNavigate();
@@ -8,7 +10,7 @@ export function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     cnpj: '', razaoSocial: '', nomeFantasia: '', porte: '', segmento: '',
-    setorAtuacao: '', localizacaoMatriz: '', regioesAtuacao: '',
+    setorAtuacao: '', localizacaoMatriz: '', regioesAtuacao: [],
     qtdColaboradores: '', percentualDiversidade: '', prazoMetaEsg: '',
     nome: '', email: '', cargo: '', senha: ''
   });
@@ -28,7 +30,7 @@ export function RegisterPage() {
         segmento: form.segmento,
         setorAtuacao: form.setorAtuacao,
         localizacaoMatriz: form.localizacaoMatriz,
-        regioesAtuacao: form.regioesAtuacao.split(',').map(r => r.trim()),
+        regioesAtuacao: form.regioesAtuacao,
         qtdColaboradores: parseInt(form.qtdColaboradores),
         percentualDiversidade: parseInt(form.percentualDiversidade),
         prazoMetaEsg: form.prazoMetaEsg,
@@ -64,8 +66,14 @@ export function RegisterPage() {
             <Field label="Porte" name="porte" placeholder="Médio" />
             <Field label="Segmento" name="segmento" placeholder="Tecnologia" />
             <Field label="Setor de Atuação" name="setorAtuacao" placeholder="Fintech" />
-            <Field label="Localização Matriz" name="localizacaoMatriz" placeholder="São Paulo - SP" />
-            <Field label="Regiões de Atuação" name="regioesAtuacao" placeholder="SP, RJ, MG" />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Localização Matriz</label>
+              <StateSelect name="localizacaoMatriz" value={form.localizacaoMatriz} onChange={handleChange} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Regiões de Atuação</label>
+              <RegionSelect value={form.regioesAtuacao} onChange={(val) => setForm({ ...form, regioesAtuacao: val })} />
+            </div>
             <Field label="Qtd Colaboradores" name="qtdColaboradores" type="number" placeholder="150" />
             <Field label="Meta Diversidade (%)" name="percentualDiversidade" type="number" placeholder="30" />
             <Field label="Prazo Meta ESG" name="prazoMetaEsg" placeholder="2026-12" />

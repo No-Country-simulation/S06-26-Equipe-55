@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 const GRUPOS_DIVERSIDADE = [
   { value: 'PCD', label: 'Pessoas com Deficiência (PCD)' },
@@ -13,6 +13,15 @@ const GRUPOS_DIVERSIDADE = [
 
 export function DiversitySelect({ value = [], onChange }) {
   const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const toggle = (grupo) => {
     const updated = value.includes(grupo)
@@ -22,7 +31,7 @@ export function DiversitySelect({ value = [], onChange }) {
   };
 
   return (
-    <div className="relative">
+    <div className="relative" ref={ref}>
       <button type="button" onClick={() => setOpen(!open)}
         className="w-full border rounded-lg px-3 py-2 text-left focus:outline-none focus:ring-2 focus:ring-primary bg-white">
         {value.length > 0

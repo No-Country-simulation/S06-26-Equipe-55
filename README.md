@@ -51,6 +51,8 @@ cd modules/web && npm install && npm run dev
 | Método | Endpoint | Acesso | Descrição |
 |--------|----------|--------|-----------|
 | POST | /api/companies | Público | Cadastro de empresa |
+| GET | /api/companies/me | Autenticado | Dados da empresa |
+| PATCH | /api/companies/me | Autenticado | Editar empresa e metas ESG |
 | POST | /api/auth/login | Público | Login (retorna JWT) |
 | GET | /api/jobs | Autenticado | Listar vagas da empresa |
 | POST | /api/jobs | Autenticado | Publicar vaga |
@@ -69,7 +71,7 @@ cd modules/web && npm install && npm run dev
   "porte": "Médio",
   "segmento": "Tecnologia",
   "setorAtuacao": "Fintech",
-  "localizacaoMatriz": "São Paulo - SP",
+  "localizacaoMatriz": "SP",
   "regioesAtuacao": ["SP", "RJ", "MG"],
   "qtdColaboradores": 150,
   "percentualDiversidade": 30,
@@ -164,6 +166,7 @@ modules/
     ├── domains/job/        → Vagas (listagem, detalhe, edição)
     ├── domains/match/      → Matching de candidatos
     ├── domains/dashboard/  → Dashboard com gráficos
+    ├── domains/profile/    → Configurações da empresa
     └── shared/             → Componentes, contexto e serviços
 ```
 
