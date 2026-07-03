@@ -52,6 +52,15 @@ public class SimulationService {
         }
 
         if (criterios.isEmpty() && regioes.isEmpty()) {
+            // Calcular diversidade mesmo sem critérios de filtragem
+            if (request.gruposFoco() != null && !request.gruposFoco().isEmpty()) {
+                long diversityCount = allCandidates.stream()
+                        .filter(c -> c.gruposDiversidade() != null &&
+                                c.gruposDiversidade().stream().anyMatch(g -> request.gruposFoco().contains(g)))
+                        .count();
+                int diversidade = total > 0 ? (int) (diversityCount * 100 / total) : 0;
+                return new SimulationResponse(total, total, List.of(), diversidade);
+            }
             return new SimulationResponse(total, total, List.of(), 0);
         }
 

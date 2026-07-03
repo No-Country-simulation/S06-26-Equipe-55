@@ -40,5 +40,8 @@ public record JobRequest(
         Integer diversidadeMinima,
 
         @Schema(description = "Ativar filtro anti-viés", example = "true")
-        Boolean filtroAntiVies
+        Boolean filtroAntiVies,
+
+        @Schema(description = "Vaga exclusiva para os grupos de diversidade selecionados", example = "false")
+        Boolean exclusivo
 ) {}

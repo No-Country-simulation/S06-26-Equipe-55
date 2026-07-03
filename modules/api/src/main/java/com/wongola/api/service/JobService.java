@@ -34,6 +34,7 @@ public class JobService {
         job.setGruposFoco(request.gruposFoco());
         job.setDiversidadeMinima(request.diversidadeMinima());
         job.setFiltroAntiVies(request.filtroAntiVies());
+        job.setExclusivo(request.exclusivo());
 
         return jobRepository.save(job);
     }
@@ -58,6 +59,7 @@ public class JobService {
         if (request.gruposFoco() != null) job.setGruposFoco(request.gruposFoco());
         if (request.diversidadeMinima() != null) job.setDiversidadeMinima(request.diversidadeMinima());
         if (request.filtroAntiVies() != null) job.setFiltroAntiVies(request.filtroAntiVies());
+        if (request.exclusivo() != null) job.setExclusivo(request.exclusivo());
 
         return jobRepository.save(job);
     }

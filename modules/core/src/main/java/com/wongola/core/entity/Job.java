@@ -44,6 +44,9 @@ public class Job {
     @Column(name = "filtro_anti_vies")
     private Boolean filtroAntiVies;
 
+    @Column(name = "exclusivo")
+    private Boolean exclusivo;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -83,6 +86,9 @@ public class Job {
 
     public Boolean getFiltroAntiVies() { return filtroAntiVies; }
     public void setFiltroAntiVies(Boolean filtroAntiVies) { this.filtroAntiVies = filtroAntiVies; }
+
+    public Boolean getExclusivo() { return exclusivo; }
+    public void setExclusivo(Boolean exclusivo) { this.exclusivo = exclusivo; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

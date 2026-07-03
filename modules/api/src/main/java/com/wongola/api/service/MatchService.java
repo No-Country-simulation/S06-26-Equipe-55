@@ -32,6 +32,14 @@ public class MatchService {
 
         List<CandidateDTO> candidates = candidateProvider.findAll();
 
+        // Se vaga é exclusiva, filtrar apenas candidatos dos grupos de diversidade
+        if (Boolean.TRUE.equals(job.getExclusivo()) && job.getGruposFoco() != null && !job.getGruposFoco().isEmpty()) {
+            candidates = candidates.stream()
+                    .filter(c -> c.gruposDiversidade() != null &&
+                            c.gruposDiversidade().stream().anyMatch(g -> job.getGruposFoco().contains(g)))
+                    .toList();
+        }
+
         List<CandidateMatch> ranked = candidates.stream()
                 .map(c -> toMatch(c, job))
                 .filter(c -> c.score() > 0)

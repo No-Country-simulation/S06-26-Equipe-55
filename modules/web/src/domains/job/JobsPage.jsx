@@ -11,9 +11,10 @@ export function JobsPage() {
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [sortBy, setSortBy] = useState('recent');
   const [form, setForm] = useState({
     titulo: '', descricao: '', skills: '', nivel: '', regiao: [],
-    gruposFoco: [], diversidadeMinima: ''
+    gruposFoco: [], diversidadeMinima: '', exclusivo: false
   });
   const [simulation, setSimulation] = useState(null);
   const debounceRef = useRef(null);
@@ -36,6 +37,19 @@ export function JobsPage() {
     }
   };
 
+  const sortedJobs = [...jobs].sort((a, b) => {
+    switch (sortBy) {
+      case 'recent': return new Date(b.createdAt) - new Date(a.createdAt);
+      case 'oldest': return new Date(a.createdAt) - new Date(b.createdAt);
+      case 'title': return a.titulo.localeCompare(b.titulo);
+      case 'nivel': {
+        const order = { 'Senior': 1, 'Pleno': 2, 'Junior': 3 };
+        return (order[a.nivel] || 4) - (order[b.nivel] || 4);
+      }
+      default: return 0;
+    }
+  });
+
   const handleChange = (e) => {
     const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
     setForm({ ...form, [e.target.name]: value });
@@ -45,8 +59,9 @@ export function JobsPage() {
     const skills = currentForm.skills ? currentForm.skills.split(',').map(s => s.trim()).filter(Boolean) : [];
     const nivel = currentForm.nivel ? currentForm.nivel.trim() : '';
     const regiao = currentForm.regiao && currentForm.regiao.length > 0 ? currentForm.regiao : [];
+    const gruposFoco = currentForm.gruposFoco && currentForm.gruposFoco.length > 0 ? currentForm.gruposFoco : [];
 
-    if (skills.length === 0 && !nivel && regiao.length === 0) {
+    if (skills.length === 0 && !nivel && regiao.length === 0 && gruposFoco.length === 0) {
       setSimulation({ totalCandidatos: 8, candidatosElegiveis: 8, impactoPorCriterio: [], diversidadeEstimada: 0, empty: true });
       return;
     }
@@ -81,10 +96,11 @@ export function JobsPage() {
         nivel: form.nivel,
         regiao: form.regiao.includes('BRASIL') ? 'BRASIL' : form.regiao.join(', '),
         gruposFoco: form.gruposFoco,
-        diversidadeMinima: form.diversidadeMinima ? parseInt(form.diversidadeMinima) : null
+        diversidadeMinima: form.diversidadeMinima ? parseInt(form.diversidadeMinima) : null,
+        exclusivo: form.exclusivo
       });
       setShowForm(false);
-      setForm({ titulo: '', descricao: '', skills: '', nivel: '', regiao: [], gruposFoco: [], diversidadeMinima: '' });
+      setForm({ titulo: '', descricao: '', skills: '', nivel: '', regiao: [], gruposFoco: [], diversidadeMinima: '', exclusivo: false });
       setSimulation(null);
       loadJobs();
     } catch (err) {
@@ -136,6 +152,12 @@ export function JobsPage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Grupos Foco (opcional)</label>
               <DiversitySelect value={form.gruposFoco} onChange={(val) => setForm({ ...form, gruposFoco: val })} />
+              {form.gruposFoco.length > 0 && (
+                <label className="flex items-center gap-2 mt-2 cursor-pointer">
+                  <input type="checkbox" name="exclusivo" checked={form.exclusivo} onChange={handleChange} className="rounded" />
+                  <span className="text-sm text-gray-600">Vaga exclusiva para esses grupos</span>
+                </label>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Diversidade Mínima (%)</label>
@@ -161,11 +183,14 @@ export function JobsPage() {
 
               {simulation.empty ? (
                 <p className="text-sm text-gray-600">
-                  🎯 Adicione skills ou nível para visualizar o alcance da vaga entre os <span className="font-bold">{simulation.totalCandidatos || 'todos os'}</span> candidatos da base.
+                  🎯 Adicione skills, nível ou região para visualizar o alcance da vaga entre os <span className="font-bold">{simulation.totalCandidatos || 'todos os'}</span> candidatos da base.
                 </p>
               ) : simulation.candidatosElegiveis === simulation.totalCandidatos ? (
                 <p className="text-sm text-green-700">
-                  ✅ Todos os <span className="font-bold">{simulation.totalCandidatos}</span> candidatos da base atendem aos critérios atuais. Você pode adicionar mais requisitos para refinar a busca.
+                  ✅ Todos os <span className="font-bold">{simulation.totalCandidatos}</span> candidatos da base atendem aos critérios atuais.
+                  {simulation.diversidadeEstimada > 0 && (
+                    <> Destes, <span className="font-bold text-green-600">{simulation.diversidadeEstimada}%</span> pertencem aos grupos de diversidade selecionados.</>
+                  )}
                 </p>
               ) : (
                 <>
@@ -204,9 +229,19 @@ export function JobsPage() {
         </form>
       )}
 
+      <div className="flex justify-start mb-4">
+        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}
+          className="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer">
+          <option value="recent">Ordenar por: Mais recentes</option>
+          <option value="oldest">Ordenar por: Mais antigas</option>
+          <option value="title">Ordenar por: Título (A-Z)</option>
+          <option value="nivel">Ordenar por: Nível</option>
+        </select>
+      </div>
+
       <div className="space-y-4">
-        {jobs.length === 0 && <p className="text-gray-500 text-center py-8">Nenhuma vaga publicada ainda.</p>}
-        {jobs.map(job => (
+        {sortedJobs.length === 0 && <p className="text-gray-500 text-center py-8">Nenhuma vaga publicada ainda.</p>}
+        {sortedJobs.map(job => (
           <Link to={`/jobs/${job.id}`} key={job.id} className="block cursor-pointer">
             <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer">
               <div className="flex justify-between items-start">

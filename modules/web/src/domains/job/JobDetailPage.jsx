@@ -26,7 +26,8 @@ export function JobDetailPage() {
           nivel: found.nivel,
           regiao: found.regiao,
           gruposFoco: found.gruposFoco || [],
-          diversidadeMinima: found.diversidadeMinima || ''
+          diversidadeMinima: found.diversidadeMinima || '',
+          exclusivo: found.exclusivo || false
         });
       } else setError('Vaga não encontrada');
     }).catch(() => setError('Erro ao carregar vaga'));
@@ -51,7 +52,8 @@ export function JobDetailPage() {
         nivel: form.nivel,
         regiao: form.regiao,
         gruposFoco: form.gruposFoco,
-        diversidadeMinima: form.diversidadeMinima ? parseInt(form.diversidadeMinima) : null
+        diversidadeMinima: form.diversidadeMinima ? parseInt(form.diversidadeMinima) : null,
+        exclusivo: form.exclusivo
       });
       setJob(updated);
       setEditing(false);
@@ -131,6 +133,9 @@ export function JobDetailPage() {
                       <span key={g} className="bg-green-100 text-green-700 text-sm px-3 py-1 rounded">{g}</span>
                     ))}
                   </div>
+                  {job.exclusivo && (
+                    <p className="text-sm text-amber-600 mt-2">🔒 Vaga exclusiva para esses grupos</p>
+                  )}
                 </div>
               )}
 
@@ -178,6 +183,12 @@ export function JobDetailPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Grupos Foco</label>
                 <DiversitySelect value={form.gruposFoco} onChange={(val) => setForm({ ...form, gruposFoco: val })} />
+                {form.gruposFoco.length > 0 && (
+                  <label className="flex items-center gap-2 mt-2 cursor-pointer">
+                    <input type="checkbox" name="exclusivo" checked={form.exclusivo} onChange={handleChange} className="rounded" />
+                    <span className="text-sm text-gray-600">Vaga exclusiva para esses grupos</span>
+                  </label>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Diversidade Mínima (%)</label>

@@ -36,10 +36,8 @@ class SimulationServiceTest {
     @Test
     void shouldReturnAllCandidatesWhenNoCriteria() {
         when(candidateProvider.findAll()).thenReturn(mockCandidates());
-
-        JobRequest request = new JobRequest(1L, "test", "test", List.of(), null, null, null, null, null);
+        JobRequest request = new JobRequest(1L, "test", "test", List.of(), null, null, null, null, null, null);
         SimulationResponse response = simulationService.simulate(request);
-
         assertEquals(4, response.totalCandidatos());
         assertEquals(4, response.candidatosElegiveis());
         assertTrue(response.impactoPorCriterio().isEmpty());
@@ -48,74 +46,59 @@ class SimulationServiceTest {
     @Test
     void shouldFilterBySkill() {
         when(candidateProvider.findAll()).thenReturn(mockCandidates());
-
-        JobRequest request = new JobRequest(1L, "test", "test", List.of("Java"), null, null, null, null, null);
+        JobRequest request = new JobRequest(1L, "test", "test", List.of("Java"), null, null, null, null, null, null);
         SimulationResponse response = simulationService.simulate(request);
-
         assertEquals(4, response.totalCandidatos());
-        assertEquals(3, response.candidatosElegiveis()); // João, Carlos, Ana
+        assertEquals(3, response.candidatosElegiveis());
     }
 
     @Test
     void shouldFilterByNivel() {
         when(candidateProvider.findAll()).thenReturn(mockCandidates());
-
-        JobRequest request = new JobRequest(1L, "test", "test", List.of(), "Pleno", null, null, null, null);
+        JobRequest request = new JobRequest(1L, "test", "test", List.of(), "Pleno", null, null, null, null, null);
         SimulationResponse response = simulationService.simulate(request);
-
-        assertEquals(2, response.candidatosElegiveis()); // João, Carlos
+        assertEquals(2, response.candidatosElegiveis());
     }
 
     @Test
     void shouldFilterByRegion() {
         when(candidateProvider.findAll()).thenReturn(mockCandidates());
-
-        JobRequest request = new JobRequest(1L, "test", "test", List.of(), null, "SP", null, null, null);
+        JobRequest request = new JobRequest(1L, "test", "test", List.of(), null, "SP", null, null, null, null);
         SimulationResponse response = simulationService.simulate(request);
-
-        assertEquals(2, response.candidatosElegiveis()); // João, Ana (São Paulo - SP)
+        assertEquals(2, response.candidatosElegiveis());
     }
 
     @Test
     void shouldReturnZeroForNonExistentRegion() {
         when(candidateProvider.findAll()).thenReturn(mockCandidates());
-
-        JobRequest request = new JobRequest(1L, "test", "test", List.of(), null, "AC", null, null, null);
+        JobRequest request = new JobRequest(1L, "test", "test", List.of(), null, "AC", null, null, null, null);
         SimulationResponse response = simulationService.simulate(request);
-
         assertEquals(0, response.candidatosElegiveis());
     }
 
     @Test
     void shouldCalculateImpactPerCriteria() {
         when(candidateProvider.findAll()).thenReturn(mockCandidates());
-
-        JobRequest request = new JobRequest(1L, "test", "test", List.of("Java"), "Pleno", "SP", null, null, null);
+        JobRequest request = new JobRequest(1L, "test", "test", List.of("Java"), "Pleno", "SP", null, null, null, null);
         SimulationResponse response = simulationService.simulate(request);
-
-        assertEquals(1, response.candidatosElegiveis()); // só João (Java + Pleno + SP)
+        assertEquals(1, response.candidatosElegiveis());
         assertFalse(response.impactoPorCriterio().isEmpty());
     }
 
     @Test
     void shouldCalculateDiversityPercentage() {
         when(candidateProvider.findAll()).thenReturn(mockCandidates());
-
-        JobRequest request = new JobRequest(1L, "test", "test", List.of("Java"), null, null, List.of("PCD"), null, null);
+        JobRequest request = new JobRequest(1L, "test", "test", List.of("Java"), null, null, List.of("PCD"), null, null, null);
         SimulationResponse response = simulationService.simulate(request);
-
-        assertEquals(3, response.candidatosElegiveis()); // João, Carlos, Ana
-        // Carlos (PCD) e Ana (PCD) = 2 de 3 = 66%
+        assertEquals(3, response.candidatosElegiveis());
         assertEquals(66, response.diversidadeEstimada());
     }
 
     @Test
     void shouldIgnoreBrasilAsRegion() {
         when(candidateProvider.findAll()).thenReturn(mockCandidates());
-
-        JobRequest request = new JobRequest(1L, "test", "test", List.of(), null, "BRASIL", null, null, null);
+        JobRequest request = new JobRequest(1L, "test", "test", List.of(), null, "BRASIL", null, null, null, null);
         SimulationResponse response = simulationService.simulate(request);
-
         assertEquals(4, response.totalCandidatos());
         assertEquals(4, response.candidatosElegiveis());
     }

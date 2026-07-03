@@ -18,6 +18,7 @@ public record JobResponse(
         List<String> gruposFoco,
         Integer diversidadeMinima,
         Boolean filtroAntiVies,
+        Boolean exclusivo,
         LocalDateTime createdAt
 ) {
     public static JobResponse from(Job job) {
@@ -32,6 +33,7 @@ public record JobResponse(
                 job.getGruposFoco(),
                 job.getDiversidadeMinima(),
                 job.getFiltroAntiVies(),
+                job.getExclusivo(),
                 job.getCreatedAt()
         );
     }

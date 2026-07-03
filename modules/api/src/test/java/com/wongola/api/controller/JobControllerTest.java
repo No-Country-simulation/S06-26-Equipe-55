@@ -81,7 +81,7 @@ class JobControllerTest {
                 companyId, "Dev Backend",
                 "Buscamos desenvolvedor backend com experiência em microsserviços",
                 List.of("Java", "Spring Boot"), "Pleno", "SP",
-                List.of("PCD", "RACIAL"), 40, true
+                List.of("PCD", "RACIAL"), 40, true, false
         );
 
         mockMvc.perform(post("/api/jobs")
@@ -106,7 +106,7 @@ class JobControllerTest {
                 999L, "Dev Backend",
                 "Descrição da vaga",
                 List.of("Java"), "Pleno", "SP",
-                List.of("PCD"), 40, true
+                List.of("PCD"), 40, true, false
         );
 
         mockMvc.perform(post("/api/jobs")
@@ -125,7 +125,7 @@ class JobControllerTest {
         JobRequest request = new JobRequest(
                 companyId, "Dev Backend", longDescription,
                 List.of("Java"), "Pleno", "SP",
-                List.of("PCD"), 40, true
+                List.of("PCD"), 40, true, false
         );
 
         mockMvc.perform(post("/api/jobs")
@@ -141,7 +141,7 @@ class JobControllerTest {
                 1L, "Dev Backend",
                 "Descrição da vaga",
                 List.of("Java"), "Pleno", "SP",
-                List.of("PCD"), 40, true
+                List.of("PCD"), 40, true, false
         );
 
         mockMvc.perform(post("/api/jobs")
@@ -159,7 +159,7 @@ class JobControllerTest {
                 companyId, "Dev Backend",
                 "Descrição da vaga",
                 List.of("Java"), "Pleno", "SP",
-                List.of("PCD"), 40, true
+                List.of("PCD"), 40, true, false
         );
 
         mockMvc.perform(post("/api/jobs")
