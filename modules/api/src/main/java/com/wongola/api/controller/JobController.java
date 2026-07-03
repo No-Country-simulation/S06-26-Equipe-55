@@ -2,7 +2,9 @@ package com.wongola.api.controller;
 
 import com.wongola.api.dto.JobRequest;
 import com.wongola.api.dto.JobResponse;
+import com.wongola.api.dto.SimulationResponse;
 import com.wongola.api.service.JobService;
+import com.wongola.api.service.SimulationService;
 import com.wongola.core.entity.Job;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -21,9 +23,11 @@ import java.util.List;
 public class JobController {
 
     private final JobService jobService;
+    private final SimulationService simulationService;
 
-    public JobController(JobService jobService) {
+    public JobController(JobService jobService, SimulationService simulationService) {
         this.jobService = jobService;
+        this.simulationService = simulationService;
     }
 
     @PostMapping
@@ -54,5 +58,13 @@ public class JobController {
         Long companyId = (Long) authentication.getDetails();
         Job job = jobService.update(id, request, companyId);
         return ResponseEntity.ok(JobResponse.from(job));
+    }
+
+    @PostMapping("/simulate")
+    @Operation(summary = "Simular impacto da vaga", description = "Analisa o impacto de cada critério no alcance de candidatos antes de publicar")
+    @ApiResponse(responseCode = "200", description = "Simulação realizada")
+    public ResponseEntity<SimulationResponse> simulate(@RequestBody JobRequest request) {
+        SimulationResponse response = simulationService.simulate(request);
+        return ResponseEntity.ok(response);
     }
 }

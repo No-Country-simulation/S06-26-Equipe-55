@@ -58,6 +58,7 @@ cd modules/web && npm install && npm run dev
 | POST | /api/jobs | Autenticado | Publicar vaga |
 | PATCH | /api/jobs/{id} | Autenticado | Editar vaga |
 | POST | /api/match | Autenticado | Matching de candidatos |
+| POST | /api/jobs/simulate | Autenticado | Simulador de impacto da vaga |
 
 ## API - Cadastro de Empresa
 
@@ -153,6 +154,42 @@ Response:
 ```
 
 Score = % de critérios da vaga que o candidato atende (skills + nível).
+
+## API - Simulador de Impacto
+
+`POST /api/jobs/simulate` (requer token)
+
+Analisa o alcance da vaga antes de publicar, mostrando quantos candidatos atendem aos critérios e o impacto de cada requisito.
+
+```json
+{
+  "empresaId": 1,
+  "titulo": "Dev Backend",
+  "descricao": "Descrição",
+  "skills": ["Java", "Spring Boot"],
+  "nivel": "Pleno",
+  "regiao": "SP,RJ",
+  "gruposFoco": ["PCD"],
+  "diversidadeMinima": null
+}
+```
+
+Response:
+
+```json
+{
+  "totalCandidatos": 8,
+  "candidatosElegiveis": 2,
+  "impactoPorCriterio": [
+    { "criterio": "Pleno", "semEsse": 4, "ganho": 2 },
+    { "criterio": "Região (SP, RJ)", "semEsse": 4, "ganho": 2 },
+    { "criterio": "Java", "semEsse": 2, "ganho": 0 }
+  ],
+  "diversidadeEstimada": 50
+}
+```
+
+Cada critério mostra quantos candidatos a mais ficam elegíveis se removido.
 
 ## Estrutura
 
