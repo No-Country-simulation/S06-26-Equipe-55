@@ -202,10 +202,17 @@ modules/
     ├── domains/company/    → Cadastro de empresa
     ├── domains/job/        → Vagas (listagem, detalhe, edição)
     ├── domains/match/      → Matching de candidatos
-    ├── domains/dashboard/  → Dashboard com gráficos
+    ├── domains/dashboard/  → Dashboard com gráficos e heatmap de exclusão
     ├── domains/profile/    → Configurações da empresa
     └── shared/             → Componentes, contexto e serviços
 ```
+
+## Dashboard
+
+O dashboard exibe métricas de diversidade, gráficos e um heatmap de exclusão:
+
+- **Heatmap de exclusão** — Avalia cada critério (skill, nível, região) isoladamente contra a base de candidatos, mostrando o percentual de candidatos excluídos por cada requisito. Cores indicam severidade: verde (<30%), amarelo (30-60%), vermelho (>60%).
+- **Relatório ESG (PDF)** — Exportável com métricas de diversidade, metas e resultados para stakeholders.
 
 ## Testes
 

@@ -11,6 +11,8 @@ export function DashboardPage() {
   const [jobs, setJobs] = useState([]);
   const [matchData, setMatchData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [exclusionData, setExclusionData] = useState([]);
+  const [exclusionLimit, setExclusionLimit] = useState(5);
   const [locationLimit, setLocationLimit] = useState(10);
   const [scoreOffset, setScoreOffset] = useState(0);
   const [skillsOffset, setSkillsOffset] = useState(0);
@@ -32,6 +34,61 @@ export function DashboardPage() {
         );
         const validMatches = allMatches.filter(Boolean);
         setMatchData(validMatches);
+
+        // Heatmap de exclusão - avalia cada critério isoladamente
+        try {
+          const allCriteria = new Set();
+          jobsList.forEach(j => {
+            j.skills.forEach(s => allCriteria.add(s));
+            if (j.nivel) allCriteria.add(j.nivel);
+            if (j.regiao && j.regiao !== 'BRASIL') {
+              j.regiao.split(',').map(r => r.trim()).forEach(r => allCriteria.add(`Região: ${r}`));
+            }
+          });
+
+          // Para cada critério, simular isoladamente
+          const exclusionResults = await Promise.all(
+            [...allCriteria].map(async (criterio) => {
+              const isRegiao = criterio.startsWith('Região: ');
+              const isNivel = ['Junior', 'Pleno', 'Senior'].includes(criterio);
+              
+              let skills = [];
+              let nivel = null;
+              let regiao = null;
+
+              if (isRegiao) {
+                regiao = criterio.replace('Região: ', '');
+              } else if (isNivel) {
+                nivel = criterio;
+              } else {
+                skills = [criterio];
+              }
+
+              try {
+                const sim = await api.post('/jobs/simulate', {
+                  empresaId: jobsList[0].empresaId,
+                  titulo: 'sim', descricao: 'sim',
+                  skills, nivel, regiao,
+                  gruposFoco: [], diversidadeMinima: null
+                });
+                const exclusion = sim.totalCandidatos > 0
+                  ? Math.round(((sim.totalCandidatos - sim.candidatosElegiveis) / sim.totalCandidatos) * 100)
+                  : 100;
+                return { name: criterio, exclusion };
+              } catch (e) {
+                return null;
+              }
+            })
+          );
+
+          const exclusionList = exclusionResults
+            .filter(Boolean)
+            .filter(item => item.exclusion > 0)
+            .sort((a, b) => a.exclusion - b.exclusion);
+          setExclusionData(exclusionList);
+        } catch (e) {
+          console.error('Erro ao carregar heatmap:', e);
+        }
       }
     } catch (err) {
       console.error(err);
@@ -280,6 +337,45 @@ export function DashboardPage() {
           📄 Exportar Relatório ESG (PDF)
         </button>
       </div>
+
+      {/* Heatmap de exclusão */}
+      {exclusionData.length > 0 && (
+        <div className="bg-white rounded-lg shadow p-6 mb-8">
+          <h2 className="text-lg font-semibold text-primary mb-2">Critérios que mais excluem candidatos</h2>
+          <p className="text-xs text-gray-500 mb-4">Média de exclusão por critério em todas as vagas publicadas</p>
+          <div className="space-y-3">
+            {exclusionData.slice(0, exclusionLimit).map(item => (
+              <div key={item.name} className="flex items-center gap-3">
+                <span className="text-sm text-gray-700 w-32 shrink-0 truncate" title={item.name}>{item.name}</span>
+                <div className="flex-1 bg-gray-100 rounded-full h-5 relative overflow-hidden">
+                  <div
+                    className="h-full rounded-full transition-all"
+                    style={{
+                      width: `${item.exclusion}%`,
+                      backgroundColor: item.exclusion > 60 ? '#ef4444' : item.exclusion > 30 ? '#f59e0b' : '#10b981'
+                    }}
+                  />
+                </div>
+                <span className={`text-sm font-medium w-12 text-right ${
+                  item.exclusion > 60 ? 'text-red-600' : item.exclusion > 30 ? 'text-amber-600' : 'text-green-600'
+                }`}>{item.exclusion}%</span>
+              </div>
+            ))}
+          </div>
+          {exclusionData.length > exclusionLimit && (
+            <button onClick={() => setExclusionLimit(exclusionLimit + 5)}
+              className="mt-4 text-sm text-primary font-medium hover:underline cursor-pointer">
+              Ver mais ({exclusionData.length - exclusionLimit} restantes)
+            </button>
+          )}
+          {exclusionLimit > 5 && (
+            <button onClick={() => setExclusionLimit(5)}
+              className="mt-4 ml-4 text-sm text-gray-500 hover:underline cursor-pointer">
+              Ver menos
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Métricas */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 mb-8">
