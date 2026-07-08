@@ -194,12 +194,25 @@ export function JobsPage() {
                 </p>
               ) : (
                 <>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Com os critérios atuais, <span className="font-bold text-primary">{simulation.candidatosElegiveis}</span> de <span className="font-bold">{simulation.totalCandidatos}</span> candidatos atendem a todos os requisitos.
-                    {simulation.diversidadeEstimada > 0 && (
-                      <> Destes, <span className="font-bold text-green-600">{simulation.diversidadeEstimada}%</span> pertencem aos grupos de diversidade selecionados.</>  
-                    )}
+                  <p className="text-sm text-gray-600 mb-2">
+                    Com os critérios atuais, <span className="font-bold text-primary">{simulation.candidatosElegiveis}</span> de <span className="font-bold">{simulation.totalCandidatos}</span> candidatos atendem a <span className="font-bold">todos</span> os requisitos.
                   </p>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+                    <div className="bg-white p-3 rounded border border-amber-100 text-center">
+                      <p className="text-2xl font-bold text-primary">{simulation.candidatosParciais ?? '-'}</p>
+                      <p className="text-xs text-gray-500">atendem pelo menos 1 critério</p>
+                    </div>
+                    <div className="bg-white p-3 rounded border border-amber-100 text-center">
+                      <p className="text-2xl font-bold text-amber-600">{simulation.aderenciaMedia ?? 0}%</p>
+                      <p className="text-xs text-gray-500">aderência média aos critérios</p>
+                    </div>
+                    <div className="bg-white p-3 rounded border border-amber-100 text-center">
+                      <p className="text-2xl font-bold text-green-600">{simulation.diversidadeEstimada ?? 0}%</p>
+                      <p className="text-xs text-gray-500">diversidade estimada</p>
+                    </div>
+                  </div>
+
                   {simulation.impactoPorCriterio.length > 0 && (
                     <div>
                       <p className="text-sm font-medium text-gray-700 mb-2">Impacto de cada critério:</p>
@@ -209,9 +222,9 @@ export function JobsPage() {
                             <span>{c.ganho > 0 ? '💡' : '🔒'}</span>
                             <span className="text-gray-700">
                               {c.ganho > 0 ? (
-                                <>Remover <span className="font-semibold">"{c.criterio}"</span> aumentaria o alcance para <span className="font-bold text-green-600">{c.semEsse}</span> candidatos <span className="text-green-600">(+{c.ganho})</span></>
+                                <>Sem o critério <span className="font-semibold">"{c.criterio}"</span>, <span className="font-bold text-green-600">{c.semEsse}</span> candidatos atenderiam todos os requisitos restantes <span className="text-green-600">(+{c.ganho})</span></>
                               ) : (
-                                <><span className="font-semibold">"{c.criterio}"</span> — nenhum candidato adicional mesmo removendo este critério</>
+                                <><span className="font-semibold">"{c.criterio}"</span> — não é um fator limitante, removê-lo não aumenta o alcance</>
                               )}
                             </span>
                           </div>
@@ -220,7 +233,7 @@ export function JobsPage() {
                     </div>
                   )}
                   {simulation.candidatosElegiveis === 0 && simulation.impactoPorCriterio.every(c => c.ganho === 0) && (
-                    <p className="text-sm text-red-600">⚠️ Nenhum candidato na base atende a esses critérios. Considere flexibilizar os requisitos.</p>
+                    <p className="text-sm text-red-600 mt-3">⚠️ Nenhum candidato na base atende a esses critérios. Considere flexibilizar os requisitos.</p>
                   )}
                 </>
               )}

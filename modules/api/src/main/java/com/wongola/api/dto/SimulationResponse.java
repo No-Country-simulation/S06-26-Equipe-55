@@ -17,5 +17,11 @@ public record SimulationResponse(
         List<CriterioImpacto> impactoPorCriterio,
 
         @Schema(description = "% de diversidade estimada no resultado")
-        Integer diversidadeEstimada
+        Integer diversidadeEstimada,
+
+        @Schema(description = "Candidatos que atendem pelo menos 1 critério")
+        Integer candidatosParciais,
+
+        @Schema(description = "% média de critérios atendidos por todos os candidatos")
+        Integer aderenciaMedia
 ) {}

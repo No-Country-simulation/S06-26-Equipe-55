@@ -1,4 +1,4 @@
-# Wongola - Equipe 55
+# App Bit - Equipe 55
 
 Plataforma de Matching Inclusivo que conecta empresas com profissionais de grupos sub-representados.
 
@@ -67,8 +67,8 @@ cd modules/web && npm install && npm run dev
 ```json
 {
   "cnpj": "12.345.678/0001-90",
-  "razaoSocial": "Wongola Ltda",
-  "nomeFantasia": "Wongola",
+  "razaoSocial": "App Bit Ltda",
+  "nomeFantasia": "App Bit",
   "porte": "Médio",
   "segmento": "Tecnologia",
   "setorAtuacao": "Fintech",
@@ -103,7 +103,7 @@ Response:
 {
   "token": "<jwt_token>",
   "empresaId": 1,
-  "nomeFantasia": "Wongola"
+  "nomeFantasia": "App Bit"
 }
 ```
 

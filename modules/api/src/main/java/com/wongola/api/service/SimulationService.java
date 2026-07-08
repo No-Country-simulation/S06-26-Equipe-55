@@ -52,16 +52,15 @@ public class SimulationService {
         }
 
         if (criterios.isEmpty() && regioes.isEmpty()) {
-            // Calcular diversidade mesmo sem critérios de filtragem
             if (request.gruposFoco() != null && !request.gruposFoco().isEmpty()) {
                 long diversityCount = allCandidates.stream()
                         .filter(c -> c.gruposDiversidade() != null &&
                                 c.gruposDiversidade().stream().anyMatch(g -> request.gruposFoco().contains(g)))
                         .count();
                 int diversidade = total > 0 ? (int) (diversityCount * 100 / total) : 0;
-                return new SimulationResponse(total, total, List.of(), diversidade);
+                return new SimulationResponse(total, total, List.of(), diversidade, total, 100);
             }
-            return new SimulationResponse(total, total, List.of(), 0);
+            return new SimulationResponse(total, total, List.of(), 0, total, 100);
         }
 
         // Candidatos elegíveis com todos os critérios
@@ -110,7 +109,34 @@ public class SimulationService {
                 .count();
         int diversidade = elegiveis > 0 ? (int) (diversityCount * 100 / elegiveis) : 0;
 
-        return new SimulationResponse(total, (int) elegiveis, impactos, diversidade);
+        // Calcular aderência média e candidatos parciais
+        final List<String> finalSkills = skills;
+        final String finalNivel = nivel;
+        final List<String> finalRegioes = regioes;
+        int totalCriterios = criterios.size();
+        int somaAderencia = 0;
+        int parciais = 0;
+
+        for (CandidateDTO c : allCandidates) {
+            int atendidos = 0;
+            for (String skill : finalSkills) {
+                if (c.skills().stream().anyMatch(cs -> cs.toLowerCase().contains(skill.toLowerCase()) || skill.toLowerCase().contains(cs.toLowerCase()))) {
+                    atendidos++;
+                }
+            }
+            if (finalNivel != null && (c.nivel().toLowerCase().contains(finalNivel.toLowerCase()) || finalNivel.toLowerCase().contains(c.nivel().toLowerCase()))) {
+                atendidos++;
+            }
+            if (regiaoLimita && !finalRegioes.isEmpty() && c.cidade() != null && finalRegioes.stream().anyMatch(r -> c.cidade().endsWith("- " + r.toUpperCase()) || c.cidade().equalsIgnoreCase(r))) {
+                atendidos++;
+            }
+            if (atendidos > 0) parciais++;
+            somaAderencia += totalCriterios > 0 ? (atendidos * 100 / totalCriterios) : 0;
+        }
+
+        int aderenciaMedia = total > 0 ? somaAderencia / total : 0;
+
+        return new SimulationResponse(total, (int) elegiveis, impactos, diversidade, parciais, aderenciaMedia);
     }
 
     private boolean matchesAll(CandidateDTO candidate, List<String> skills, String nivel, List<String> regioes) {
