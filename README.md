@@ -1,4 +1,4 @@
-# Wangola - Equipe 55
+# Wongola - Equipe 55
 
 Aplicação Java Spring Boot com arquitetura de monolito modular.
 
