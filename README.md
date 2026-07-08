@@ -216,15 +216,28 @@ O dashboard exibe métricas de diversidade, gráficos e um heatmap de exclusão:
 
 ## Testes
 
-**Backend:**
+**Backend (22 testes):**
+
+| Tipo | Arquivo | Cobertura |
+|------|---------|----------|
+| Integração | AuthControllerTest | Login, credenciais inválidas |
+| Integração | CompanyControllerTest | Cadastro, validações |
+| Integração | JobControllerTest | CRUD de vagas, autenticação |
+| Unitário | CompanyServiceTest | Lógica de criação de empresa |
+| Unitário | SimulationServiceTest | Simulador de impacto por critério |
+
+**Frontend (18 testes):**
+
+| Tipo | Arquivo | Cobertura |
+|------|---------|----------|
+| Unitário | api.test.js | Serviço HTTP, token, erros |
+| Unitário | sort.test.js | Ordenação de candidatos |
+| Unitário | exclusion.test.js | Heatmap de exclusão |
+
+**Executar:**
 
 ```bash
 ./mvnw clean install -pl modules/core && ./mvnw test -pl modules/api
-```
-
-**Frontend:**
-
-```bash
 cd modules/web && npm test
 ```
 
