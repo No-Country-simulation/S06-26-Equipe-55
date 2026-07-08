@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './shared/context/AuthContext';
 import { Navbar } from './shared/components/Navbar';
 import { ProtectedRoute } from './shared/components/ProtectedRoute';
@@ -22,9 +22,11 @@ export default function App() {
 
 function AppContent() {
   const { isAuthenticated } = useAuth();
+  const { pathname } = useLocation();
+  const isPublicPage = pathname === '/login' || pathname === '/register' || pathname === '/';
   return (
     <>
-      {isAuthenticated && <Navbar />}
+      {isAuthenticated && !isPublicPage && <Navbar />}
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />

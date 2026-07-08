@@ -322,7 +322,7 @@ export function DashboardPage() {
       doc.setPage(i);
       doc.setFontSize(8);
       doc.setTextColor(150);
-      doc.text(`Wongola - Relatório ESG | Página ${i} de ${pageCount}`, 20, 290);
+      doc.text(`App Bit - Relatório ESG | Página ${i} de ${pageCount}`, 20, 290);
     }
 
     doc.save(`relatorio-esg-${companyName.toLowerCase().replace(/\s/g, '-')}-${now.replace(/\//g, '-')}.pdf`);

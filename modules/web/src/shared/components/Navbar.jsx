@@ -18,7 +18,7 @@ export function Navbar() {
   return (
     <nav className="bg-primary text-white px-4 py-3 shadow-lg">
       <div className="max-w-6xl mx-auto flex justify-between items-center">
-        <Link to="/" className="text-xl font-bold cursor-pointer" onClick={closeMenu}>Wongola</Link>
+        <Link to="/" className="text-xl font-bold cursor-pointer" onClick={closeMenu}>App Bit</Link>
 
         {/* Desktop menu */}
         <div className="hidden md:flex gap-4 items-center text-sm">
