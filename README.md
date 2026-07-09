@@ -2,6 +2,71 @@
 
 Plataforma de Matching Inclusivo que conecta empresas com profissionais de grupos sub-representados.
 
+Este projeto foi desenvolvido durante um hackathon com o objetivo de criar uma plataforma de matching inclusivo para conectar empresas a talentos de grupos sub-representados.
+
+Minha atuação foi voltada à análise de dados, explorando informações de perfil socioeconômico, distribuição geográfica, mobilidade e conectividade dos usuários para gerar insights estratégicos de recrutamento inclusivo e indicadores relacionados à diversidade.
+
+A análise utilizou dados sintéticos disponibilizados pela Wongola, referentes a 200 mil assinantes do aplicativo Black in Tech (BiT), combinando informações de usuários e infraestrutura de conectividade da região da Grande Florianópolis.
+
+## Objetivo da análise
+
+Investigar:
+
+* Onde estão concentrados os talentos disponíveis;
+* Qual o perfil socioeconômico e demográfico dos usuários;
+* Como fatores territoriais, como mobilidade e conectividade, podem influenciar oportunidades de trabalho remoto, híbrido e presencial;
+* Quais indicadores podem apoiar estratégias de diversidade e inclusão nas organizações.
+
+### Principais indicadores
+
+👥 **Perfil dos usuários**
+
+* Total analisado: 200 mil assinantes
+* Classe C: 42% (84.179 usuários)
+* Classe D: 22% (43.185 usuários)
+* Distribuição etária equilibrada entre diferentes faixas de idade
+
+📍 **Distribuição geográfica**
+
+* Florianópolis: 127.027 usuários
+* São José: 38.644 usuários
+* Palhoça: 20.251 usuários
+* Biguaçu: 6.446 usuários
+
+🚍 **Mobilidade urbana**
+
+* Baixa mobilidade: 69.725 usuários
+* Mobilidade moderada: 90.651 usuários
+* Mobilidade intensa: 39.624 usuários
+
+📡 **Infraestrutura e conectividade**
+
+* 132 antenas analisadas na região da Grande Florianópolis
+* 102 antenas localizadas em Florianópolis
+* Avaliação de volume total e consumo médio de dados por região
+
+### Insights
+
+A análise revelou que os talentos cadastrados estão concentrados principalmente em Florianópolis e municípios próximos, mas apresentam diferentes características territoriais que devem ser consideradas no planejamento de oportunidades profissionais.
+
+Os dados socioeconômicos indicam maior presença de usuários das classes C e D, reforçando o potencial da plataforma como ferramenta de ampliação do acesso a oportunidades.
+
+A análise de mobilidade mostrou que grande parte dos usuários possui deslocamento moderado ou baixo, indicando a importância de considerar modelos de trabalho remoto e híbrido.
+
+Além da localização dos talentos, a análise de conectividade demonstrou que regiões fora dos principais centros também apresentam usuários com alto nível de atividade digital, evidenciando o potencial de inclusão por meio de oportunidades profissionais mediadas por tecnologia.
+
+## Aplicação no produto
+
+Os insights gerados apoiaram a construção do App BiT, uma plataforma B2B de matching inclusivo que utiliza dados geográficos para:
+
+* Mapear regiões com concentração de talentos;
+* Apoiar recrutamento com maior alcance territorial;
+* Reduzir barreiras de acesso em processos seletivos;
+* Gerar indicadores para acompanhamento de metas de diversidade.
+
+**Ferramentas:** PostgreSQL, Microsoft Power BI e Figma (prototipação da solução)
+
+**Dados:** Dataset Vísent CDRView / Wongola — dados sintéticos de assinantes, mobilidade, concentração geográfica e infraestrutura de conectividade.
 ## Stack
 
 - **Backend:** Java 17 + Spring Boot 3.5 + PostgreSQL
