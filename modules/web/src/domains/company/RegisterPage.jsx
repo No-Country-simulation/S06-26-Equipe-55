@@ -45,14 +45,6 @@ export function RegisterPage() {
     }
   };
 
-  const Field = ({ label, name, type = 'text', placeholder }) => (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
-      <input type={type} name={name} value={form[name]} onChange={handleChange} placeholder={placeholder}
-        className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required />
-    </div>
-  );
-
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-2xl bg-white rounded-lg shadow-md p-8">
@@ -60,12 +52,36 @@ export function RegisterPage() {
         {error && <p className="bg-red-50 text-red-600 p-3 rounded mb-4 text-sm">{error}</p>}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Field label="CNPJ" name="cnpj" placeholder="12.345.678/0001-90" />
-            <Field label="Razão Social" name="razaoSocial" placeholder="Empresa Ltda" />
-            <Field label="Nome Fantasia" name="nomeFantasia" placeholder="Empresa" />
-            <Field label="Porte" name="porte" placeholder="Médio" />
-            <Field label="Segmento" name="segmento" placeholder="Tecnologia" />
-            <Field label="Setor de Atuação" name="setorAtuacao" placeholder="Fintech" />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">CNPJ</label>
+              <input name="cnpj" value={form.cnpj} onChange={handleChange} placeholder="12.345.678/0001-90"
+                className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Razão Social</label>
+              <input name="razaoSocial" value={form.razaoSocial} onChange={handleChange} placeholder="Empresa Ltda"
+                className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Nome Fantasia</label>
+              <input name="nomeFantasia" value={form.nomeFantasia} onChange={handleChange} placeholder="Empresa"
+                className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Porte</label>
+              <input name="porte" value={form.porte} onChange={handleChange} placeholder="Médio"
+                className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Segmento</label>
+              <input name="segmento" value={form.segmento} onChange={handleChange} placeholder="Tecnologia"
+                className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Setor de Atuação</label>
+              <input name="setorAtuacao" value={form.setorAtuacao} onChange={handleChange} placeholder="Fintech"
+                className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required />
+            </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Localização Matriz</label>
               <StateSelect name="localizacaoMatriz" value={form.localizacaoMatriz} onChange={handleChange} />
@@ -74,17 +90,45 @@ export function RegisterPage() {
               <label className="block text-sm font-medium text-gray-700 mb-1">Regiões de Atuação</label>
               <RegionSelect value={form.regioesAtuacao} onChange={(val) => setForm({ ...form, regioesAtuacao: val })} />
             </div>
-            <Field label="Qtd Colaboradores" name="qtdColaboradores" type="number" placeholder="150" />
-            <Field label="Meta Diversidade (%)" name="percentualDiversidade" type="number" placeholder="30" />
-            <Field label="Prazo Meta ESG" name="prazoMetaEsg" placeholder="2026-12" />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Qtd Colaboradores</label>
+              <input type="number" name="qtdColaboradores" value={form.qtdColaboradores} onChange={handleChange} placeholder="150"
+                className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Meta Diversidade (%)</label>
+              <input type="number" name="percentualDiversidade" value={form.percentualDiversidade} onChange={handleChange} placeholder="30"
+                className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Prazo Meta ESG</label>
+              <input name="prazoMetaEsg" value={form.prazoMetaEsg} onChange={handleChange} placeholder="2026-12"
+                className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required />
+            </div>
           </div>
           <hr className="my-4" />
           <h2 className="text-lg font-semibold text-primary">Responsável de RH</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Field label="Nome" name="nome" placeholder="Ana Silva" />
-            <Field label="Email" name="email" type="email" placeholder="ana@empresa.com" />
-            <Field label="Cargo" name="cargo" placeholder="Head de Diversidade" />
-            <Field label="Senha" name="senha" type="password" placeholder="Mínimo 6 caracteres" />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Nome</label>
+              <input name="nome" value={form.nome} onChange={handleChange} placeholder="Ana Silva"
+                className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <input type="email" name="email" value={form.email} onChange={handleChange} placeholder="ana@empresa.com"
+                className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Cargo</label>
+              <input name="cargo" value={form.cargo} onChange={handleChange} placeholder="Head de Diversidade"
+                className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+              <input type="password" name="senha" value={form.senha} onChange={handleChange} placeholder="Mínimo 6 caracteres"
+                className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required />
+            </div>
           </div>
           <button type="submit" disabled={loading}
             className="w-full bg-primary text-white py-2 rounded-lg font-medium hover:bg-primary-light disabled:opacity-50 mt-4">
