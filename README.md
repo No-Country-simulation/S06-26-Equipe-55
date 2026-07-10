@@ -102,6 +102,15 @@ cd modules/web && npm install && npm run dev
 - Swagger: http://localhost:8080/swagger-ui.html
 - API Docs: http://localhost:8080/api-docs
 
+## Conta Seed
+
+Ao iniciar com o banco vazio, o sistema cria automaticamente uma empresa de demonstração com 19 vagas pré-cadastradas.
+
+| Campo | Valor |
+|-------|-------|
+| Email | ana@appbit.com |
+| Senha | senha123 |
+
 ## Variáveis de ambiente
 
 | Variável | Padrão | Descrição |
@@ -144,7 +153,7 @@ cd modules/web && npm install && npm run dev
   "prazoMetaEsg": "2026-12",
   "responsavelRh": {
     "nome": "Ana Silva",
-    "email": "ana@wongola.com",
+    "email": "ana@appbit.com",
     "cargo": "Head de Diversidade"
   },
   "senha": "senha123"
@@ -157,7 +166,7 @@ cd modules/web && npm install && npm run dev
 
 ```json
 {
-  "email": "ana@wongola.com",
+  "email": "ana@appbit.com",
   "senha": "senha123"
 }
 ```

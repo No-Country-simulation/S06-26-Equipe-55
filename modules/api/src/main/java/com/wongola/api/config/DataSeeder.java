@@ -2,9 +2,11 @@ package com.wongola.api.config;
 
 import com.wongola.core.entity.Company;
 import com.wongola.core.entity.Job;
+import com.wongola.core.entity.ResponsavelRh;
 import com.wongola.core.repository.CompanyRepository;
 import com.wongola.core.repository.JobRepository;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -14,18 +16,20 @@ public class DataSeeder implements CommandLineRunner {
 
     private final JobRepository jobRepository;
     private final CompanyRepository companyRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public DataSeeder(JobRepository jobRepository, CompanyRepository companyRepository) {
+    public DataSeeder(JobRepository jobRepository, CompanyRepository companyRepository, PasswordEncoder passwordEncoder) {
         this.jobRepository = jobRepository;
         this.companyRepository = companyRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public void run(String... args) {
-        if (jobRepository.count() > 0) return;
+        if (companyRepository.count() > 0) return;
 
-        Company company = companyRepository.findAll().stream().findFirst().orElse(null);
-        if (company == null) return;
+        Company company = createSeedCompany();
+        companyRepository.save(company);
 
         List<Job> jobs = List.of(
             createJob(company, "Dev Backend", "Vaga backend Java", List.of("Java", "Spring Boot"), "Pleno", "SP", List.of("PCD", "RACIAL"), 30, false),
@@ -50,6 +54,29 @@ public class DataSeeder implements CommandLineRunner {
         );
 
         jobRepository.saveAll(jobs);
+    }
+
+    private Company createSeedCompany() {
+        ResponsavelRh rh = new ResponsavelRh();
+        rh.setNome("Ana Silva");
+        rh.setEmail("ana@appbit.com");
+        rh.setCargo("Head de Diversidade");
+
+        Company company = new Company();
+        company.setCnpj("12.345.678/0001-90");
+        company.setRazaoSocial("App Bit Ltda");
+        company.setNomeFantasia("App Bit");
+        company.setPorte("Médio");
+        company.setSegmento("Tecnologia");
+        company.setSetorAtuacao("Fintech");
+        company.setLocalizacaoMatriz("SP");
+        company.setRegioesAtuacao(List.of("SP", "RJ", "MG"));
+        company.setQtdColaboradores(150);
+        company.setPercentualDiversidade(30);
+        company.setPrazoMetaEsg("2026-12");
+        company.setResponsavelRh(rh);
+        company.setSenha(passwordEncoder.encode("senha123"));
+        return company;
     }
 
     private Job createJob(Company company, String titulo, String descricao, List<String> skills, String nivel, String regiao, List<String> gruposFoco, Integer diversidadeMinima, Boolean exclusivo) {
